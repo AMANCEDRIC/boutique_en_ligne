@@ -1,20 +1,20 @@
-<div class="max-w-[1400px] mx-auto px-6 md:px-12 py-32">
+<div class="max-w-[1400px] mx-auto px-6 md:px-12 py-16">
   <button
     (click)="goBack()"
-    class="mb-12 label-caps text-[10px] text-gray-400 hover:text-black transition-colors"
+    class="mb-8 label-caps text-[10px] text-gray-400 hover:text-black transition-colors"
   >
     ← Retour au panier
   </button>
 
-  <h1 class="h1-editorial uppercase mb-24 text-center">Finalisation</h1>
+  <h1 class="h1-editorial uppercase mb-12 text-center">Finalisation</h1>
 
   <div class="grid grid-cols-1 lg:grid-cols-12 gap-24">
     <!-- Delivery Form -->
-    <div class="lg:col-span-7 space-y-12">
-      <h2 class="h2-editorial text-2xl uppercase border-b border-maison-light-gray pb-6">Expédition</h2>
+    <div class="lg:col-span-7 space-y-8">
+      <h2 class="h2-editorial text-2xl uppercase border-b border-maison-light-gray pb-4">Expédition</h2>
 
-      <form (ngSubmit)="submitOrder()" class="space-y-12">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+      <form (ngSubmit)="submitOrder()" class="space-y-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
           <!-- Full Name -->
           <div class="space-y-2">
             <label for="name" class="label-caps text-[10px]">Nom complet <span class="text-maison-gold">*</span></label>

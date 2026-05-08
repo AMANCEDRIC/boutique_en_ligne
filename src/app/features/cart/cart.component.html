@@ -1,5 +1,5 @@
-<div class="max-w-[1200px] mx-auto px-6 md:px-12 py-32">
-  <div class="flex flex-col md:flex-row justify-between items-end mb-24 gap-8">
+<div class="max-w-[1200px] mx-auto px-6 md:px-12 py-16">
+  <div class="flex flex-col md:flex-row justify-between items-end mb-12 gap-8">
     <h1 class="h1-editorial uppercase">Votre Sélection</h1>
     <p class="label-caps text-[10px] text-gray-400">Total de {{ cartItems.length }} articles</p>
   </div>
@@ -19,13 +19,13 @@
   <ng-template #cartContent>
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-20">
       <!-- Items List -->
-      <div class="lg:col-span-8 space-y-12">
+      <div class="lg:col-span-8 space-y-8">
         <div
           *ngFor="let item of cartItems; let idx = index"
-          class="flex flex-col sm:flex-row gap-10 border-b border-maison-light-gray pb-12 group"
+          class="flex flex-col sm:flex-row gap-10 border-b border-maison-light-gray pb-8 group"
         >
           <!-- Product Image -->
-          <div class="w-32 h-44 flex-shrink-0 bg-maison-greige overflow-hidden">
+          <div class="w-40 h-56 mx-auto sm:mx-0 flex-shrink-0 bg-maison-greige overflow-hidden">
             <img
               [src]="item.image"
               class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"

@@ -90,4 +90,40 @@
   from { transform: translateY(40px); opacity: 0; }
   to { transform: translateY(0); opacity: 1; }
 }
+
+/* --- PREMIUM ANIMATIONS --- */
+@keyframes reveal-up {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes cart-pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+.reveal-on-scroll {
+  animation: reveal-up 1.2s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.cart-bounce {
+  animation: cart-pulse 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.stagger-item {
+  opacity: 0;
+  animation: reveal-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Application des animations par défaut sur certains éléments */
+.h1-editorial, .h2-editorial {
+  animation: reveal-up 1.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
 

@@ -16,6 +16,8 @@ export class ProductCardComponent {
   @Input() showBadges = true;
   @Output() addToCart = new EventEmitter<Product>();
   @Output() toggleWishlist = new EventEmitter<Product>();
+  
+  addedToCart = false;
 
   formatPrice(price: number): string {
     return new Intl.NumberFormat('fr-FR').format(price) + ' FCFA';
@@ -25,6 +27,10 @@ export class ProductCardComponent {
     event.preventDefault();
     event.stopPropagation();
     this.addToCart.emit(this.product);
+    
+    // Feedback animation
+    this.addedToCart = true;
+    setTimeout(() => this.addedToCart = false, 1500);
   }
 
   onToggleWishlist(event: MouseEvent): void {

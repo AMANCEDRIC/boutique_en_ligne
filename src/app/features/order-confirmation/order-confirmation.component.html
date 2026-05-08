@@ -1,10 +1,10 @@
-<div *ngIf="order" class="max-w-4xl mx-auto px-4 md:px-8 py-24">
+<div *ngIf="order" class="max-w-[1000px] mx-auto px-6 md:px-12 py-20">
   <!-- Message de succès -->
-  <div class="text-center mb-16">
-    <div class="inline-flex items-center justify-center w-20 h-20 bg-green-100 rounded-full mb-6">
+  <div class="text-center mb-16 space-y-6">
+    <div class="inline-flex items-center justify-center w-16 h-16 bg-maison-gold/10 rounded-full mb-4">
       <svg
         xmlns="http://www.w3.org/2000/svg"
-        class="h-12 w-12 text-green-500"
+        class="h-8 w-8 text-maison-gold"
         fill="none"
         viewBox="0 0 24 24"
         stroke="currentColor"
@@ -12,79 +12,75 @@
         <path
           stroke-linecap="round"
           stroke-linejoin="round"
-          stroke-width="2"
+          stroke-width="1.2"
           d="M5 13l4 4L19 7"
         />
       </svg>
     </div>
-    <h1 class="text-5xl font-serif uppercase mb-4 tracking-tight">
-      Commande confirmée !
+    <h1 class="h1-editorial text-4xl md:text-5xl uppercase tracking-tight">
+      Commande confirmée
     </h1>
-    <p class="text-gray-600 text-lg">
-      Merci pour votre achat. Votre commande a été enregistrée avec succès.
+    <p class="text-gray-500 font-light text-sm max-w-md mx-auto italic">
+      Merci pour votre confiance. Votre commande a été enregistrée avec succès dans nos ateliers.
     </p>
   </div>
 
   <!-- Numéro de commande -->
-  <div class="bg-black text-white rounded-2xl p-8 mb-12 text-center">
-    <p class="text-[10px] font-bold uppercase tracking-[0.3em] text-gray-400 mb-2">
-      Numéro de commande
+  <div class="bg-black text-white p-10 mb-16 text-center border border-white/5">
+    <p class="label-caps text-[10px] text-gray-500 mb-2">
+      Numéro de référence
     </p>
-    <p class="text-4xl font-serif tracking-tight">{{ order.id }}</p>
+    <p class="text-4xl font-serif tracking-[-0.02em]">{{ order.id }}</p>
   </div>
 
   <!-- Détails de la commande -->
-  <div class="space-y-8 mb-12">
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
     <!-- Informations client -->
-    <div class="bg-gray-50 rounded-2xl p-8">
-      <h2 class="text-xl font-serif uppercase mb-6 tracking-tight">
-        Informations de livraison
+    <div class="bg-maison-greige p-10 border border-maison-light-gray">
+      <h2 class="label-caps text-[12px] uppercase mb-8 border-b border-maison-light-gray pb-4">
+        Détails de Livraison
       </h2>
-      <div class="space-y-3">
+      <div class="space-y-6">
         <div>
-          <span class="text-[10px] font-bold uppercase tracking-widest text-gray-400">
-            Nom :
-          </span>
-          <p class="text-sm font-bold mt-1">{{ order.customerName }}</p>
+          <span class="label-caps text-[9px] text-gray-400">Destinataire</span>
+          <p class="text-xs uppercase tracking-widest mt-1 font-medium">{{ order.customerName }}</p>
         </div>
         <div>
-          <span class="text-[10px] font-bold uppercase tracking-widest text-gray-400">
-            Date :
-          </span>
-          <p class="text-sm font-bold mt-1">{{ order.date }}</p>
+          <span class="label-caps text-[9px] text-gray-400">Date de commande</span>
+          <p class="text-xs uppercase tracking-widest mt-1 font-medium">{{ order.date | date:'longDate' }}</p>
         </div>
         <div>
-          <span class="text-[10px] font-bold uppercase tracking-widest text-gray-400">
-            Statut :
-          </span>
-          <p class="text-sm font-bold mt-1">{{ order.status }}</p>
+          <span class="label-caps text-[9px] text-gray-400">Mode de paiement</span>
+          <p class="text-xs uppercase tracking-widest mt-1 font-medium italic">Paiement à la livraison</p>
         </div>
       </div>
     </div>
 
     <!-- Articles commandés -->
-    <div class="bg-gray-50 rounded-2xl p-8">
-      <h2 class="text-xl font-serif uppercase mb-6 tracking-tight">
-        Articles commandés
+    <div class="bg-maison-greige p-10 border border-maison-light-gray">
+      <h2 class="label-caps text-[12px] uppercase mb-8 border-b border-maison-light-gray pb-4">
+        Récapitulatif
       </h2>
-      <div class="space-y-4">
+      <div class="space-y-6 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
         <div
           *ngFor="let item of order.items"
-          class="flex items-center space-x-4 pb-4 border-b border-gray-200 last:border-0"
+          class="flex items-center space-x-4 pb-6 border-b border-white last:border-0 last:pb-0"
         >
-          <img
-            [src]="item.image"
-            [alt]="item.name"
-            class="w-20 h-28 object-cover bg-gray-100 rounded-lg"
-          />
-          <div class="flex-1">
-            <h4 class="font-bold text-sm uppercase tracking-tight">
+          <div class="w-16 h-22 flex-shrink-0 bg-white overflow-hidden">
+             <img
+               [src]="item.image"
+               [alt]="item.name"
+               class="w-full h-full object-cover"
+             />
+          </div>
+          <div class="flex-1 space-y-1">
+            <h4 class="label-caps text-[10px] text-black">
               {{ item.name }}
             </h4>
-            <p class="text-[10px] text-gray-400 uppercase tracking-widest mt-1">
+            <p class="label-caps text-[8px] text-gray-400">
               Taille: {{ item.selectedSize }} • Qté: {{ item.quantity }}
             </p>
-            <p class="font-bold text-sm mt-2">
+            <p class="font-sans text-[11px] font-semibold mt-1">
               {{ formatPrice(item.price * item.quantity) }}
             </p>
           </div>
@@ -92,29 +88,28 @@
       </div>
 
       <!-- Total -->
-      <div class="pt-6 mt-6 border-t-2 border-black">
-        <div class="flex justify-between items-baseline">
-          <span class="text-xl font-serif uppercase tracking-tight">Total</span>
-          <span class="text-2xl font-bold">{{ formatPrice(order.total) }}</span>
-        </div>
+      <div class="pt-8 mt-8 border-t border-black flex justify-between items-baseline">
+        <span class="label-caps text-[13px]">Total final</span>
+        <span class="text-2xl font-sans tracking-tighter">{{ formatPrice(order.total) }}</span>
       </div>
     </div>
   </div>
 
   <!-- Actions -->
-  <div class="flex flex-col sm:flex-row gap-4 justify-center">
+  <div class="flex flex-col sm:flex-row gap-6 justify-center pt-8 border-t border-maison-light-gray">
     <button
       (click)="goToShop()"
-      class="px-8 py-4 bg-black text-white font-bold uppercase tracking-widest text-xs hover:bg-gray-800 transition-colors rounded-lg"
+      class="px-12 py-4 bg-black text-white label-caps text-[10px] hover:bg-black/80 transition-all min-w-[200px]"
     >
       Continuer mes achats
     </button>
     <button
       (click)="goToHome()"
-      class="px-8 py-4 border border-gray-200 text-gray-400 font-bold uppercase tracking-widest text-xs hover:border-black hover:text-black transition-colors rounded-lg"
+      class="px-12 py-4 border border-black text-black label-caps text-[10px] hover:bg-black hover:text-white transition-all min-w-[200px]"
     >
       Retour à l'accueil
     </button>
   </div>
 </div>
+
 

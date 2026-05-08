@@ -18,6 +18,7 @@ export class NavbarComponent implements OnInit {
   navFilter: 'all' | 'new' | 'sale' = 'all';
   cartCount = 0;
   wishlistCount = 0;
+  cartAnimating = false;
 
   constructor(
     private router: Router,
@@ -28,7 +29,14 @@ export class NavbarComponent implements OnInit {
   ngOnInit(): void {
     // Abonnement au panier
     this.cartService.items$.subscribe((items: CartItem[]) => {
+      const oldCount = this.cartCount;
       this.cartCount = items.reduce((acc: number, item: CartItem) => acc + item.quantity, 0);
+      
+      // Animer si le nombre d'articles a augmenté
+      if (this.cartCount > oldCount) {
+        this.cartAnimating = true;
+        setTimeout(() => this.cartAnimating = false, 400);
+      }
     });
 
     // Abonnement à la wishlist

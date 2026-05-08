@@ -1,23 +1,23 @@
-<div *ngIf="product" class="max-w-[1800px] mx-auto px-6 md:px-12 py-32">
-  <div class="grid grid-cols-1 lg:grid-cols-12 gap-20">
+<div *ngIf="product" class="max-w-[1800px] mx-auto px-6 md:px-12 py-12">
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-16">
     <!-- Image Gallery Section -->
-    <div class="lg:col-span-7 space-y-8">
-      <div class="aspect-[3/4] overflow-hidden bg-maison-greige relative group cursor-crosshair">
+    <div class="lg:col-span-7 space-y-6">
+      <div class="aspect-[3/4] max-h-[80vh] mx-auto overflow-hidden bg-maison-greige relative group cursor-crosshair">
         <img [src]="product.image" class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" [alt]="product.name" />
         
         <!-- Badges -->
         <div class="absolute top-0 left-0 flex flex-col">
-          <span *ngIf="product.isNew" class="bg-black text-white label-caps text-[10px] px-4 py-2">New Arrival</span>
-          <span *ngIf="product.isSale" class="bg-maison-gold text-white label-caps text-[10px] px-4 py-2">Exclusive Offer</span>
+          <span *ngIf="product.isNew" class="bg-black text-white label-caps text-[9px] px-3 py-1.5">New Arrival</span>
+          <span *ngIf="product.isSale" class="bg-maison-gold text-white label-caps text-[9px] px-3 py-1.5">Exclusive Offer</span>
         </div>
 
         <button
           (click)="toggleWishlist()"
-          class="absolute top-6 right-6 p-4 bg-white/10 backdrop-blur-md hover:bg-white hover:text-black transition-all text-white border border-white/20"
+          class="absolute top-4 right-4 p-3 bg-white/10 backdrop-blur-md hover:bg-white hover:text-black transition-all text-white border border-white/20"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            class="h-5 w-5"
+            class="h-4 w-4"
             [ngClass]="isInWishlist() ? 'fill-current text-red-500 border-none' : ''"
             fill="none"
             viewBox="0 0 24 24"
@@ -33,7 +33,7 @@
         </button>
       </div>
       
-      <!-- Additional Views (Mockup) -->
+      <!-- Additional Views -->
       <div class="grid grid-cols-4 gap-4">
         <div *ngFor="let i of [1,2,3,4]" class="aspect-[3/4] bg-maison-greige overflow-hidden cursor-pointer hover:opacity-70 transition-opacity">
            <img [src]="product.image" class="w-full h-full object-cover" alt="View {{i}}">
@@ -42,33 +42,33 @@
     </div>
 
     <!-- Product Info Section -->
-    <div class="lg:col-span-5 space-y-12">
-      <div class="space-y-4">
-        <p class="label-caps text-gray-400 tracking-[0.3em]">{{ product.category }}</p>
-        <h1 class="h2-editorial text-5xl uppercase">{{ product.name }}</h1>
-        <p class="text-3xl font-light tracking-tight mt-6">{{ formatPrice(product.price) }}</p>
+    <div class="lg:col-span-5 space-y-8">
+      <div class="space-y-3">
+        <p class="label-caps text-gray-400 tracking-[0.3em] text-[10px]">{{ product.category }}</p>
+        <h1 class="h2-editorial text-3xl uppercase">{{ product.name }}</h1>
+        <p class="text-xl font-light tracking-tight mt-4">{{ formatPrice(product.price) }}</p>
       </div>
 
       <!-- AI Insights Block -->
-      <div *ngIf="aiReviewSummary" class="p-8 bg-maison-greige border-l border-maison-gold relative overflow-hidden">
+      <div *ngIf="aiReviewSummary" class="p-6 bg-maison-greige border-l border-maison-gold relative overflow-hidden">
         <div class="absolute top-0 right-0 p-2 opacity-10">
-          <svg class="w-16 h-16" fill="currentColor" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+          <svg class="w-12 h-12" fill="currentColor" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
         </div>
-        <h4 class="label-caps text-[11px] text-maison-gold mb-4">L'oeil de Maison Shein (IA)</h4>
-        <p class="text-sm font-sans leading-relaxed italic text-gray-700">"{{ aiReviewSummary }}"</p>
+        <h4 class="label-caps text-[10px] text-maison-gold mb-3">L'oeil de Maison Shein (IA)</h4>
+        <p class="text-[13px] font-sans leading-relaxed italic text-gray-700">"{{ aiReviewSummary }}"</p>
       </div>
 
       <!-- Size Selection -->
-      <div class="space-y-6">
+      <div class="space-y-4">
         <div class="flex justify-between items-center">
-          <h4 class="label-caps text-[11px]">Choisir une taille</h4>
-          <button class="label-caps text-[9px] text-gray-400 border-b border-gray-300 pb-1">Guide des tailles</button>
+          <h4 class="label-caps text-[10px]">Choisir une taille</h4>
+          <button class="label-caps text-[8px] text-gray-400 border-b border-gray-300 pb-1">Guide des tailles</button>
         </div>
-        <div class="flex flex-wrap gap-3">
+        <div class="flex flex-wrap gap-2">
           <button
             *ngFor="let size of product.sizes"
             (click)="selectSize(size)"
-            class="px-8 py-4 border text-[11px] label-caps transition-all min-w-[80px]"
+            class="px-6 py-3 border text-[10px] label-caps transition-all min-w-[70px]"
             [ngClass]="
               selectedSize === size
                 ? 'bg-black text-white border-black'
@@ -81,39 +81,38 @@
       </div>
 
       <!-- CTAs -->
-      <div class="space-y-4 pt-6">
+      <div class="space-y-4 pt-4">
         <button
           (click)="addToCart()"
-          class="w-full bg-black text-white py-5 label-caps text-[12px] hover:bg-black/90 transition-all"
+          class="w-full bg-black text-white py-4 label-caps text-[11px] hover:bg-black/90 transition-all"
         >
           Ajouter au panier
         </button>
         
-        <!-- WhatsApp Order Button -->
         <a
           href="https://wa.me/YOUR_NUMBER?text=Bonjour, je souhaite commander l'article: {{product.name}} ({{product.id}})"
           target="_blank"
-          class="w-full flex items-center justify-center gap-3 border border-maison-light-gray py-5 label-caps text-[12px] hover:bg-maison-greige transition-all"
+          class="w-full flex items-center justify-center gap-3 border border-maison-light-gray py-4 label-caps text-[11px] hover:bg-maison-greige transition-all"
         >
-          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
           Commander par WhatsApp
         </a>
       </div>
 
       <!-- Accordion Details -->
-      <div class="border-t border-maison-light-gray pt-8 space-y-6">
+      <div class="border-t border-maison-light-gray pt-6 space-y-4">
         <div class="collapse collapse-arrow bg-transparent rounded-none border-b border-maison-light-gray">
           <input type="checkbox" checked /> 
-          <div class="collapse-title label-caps text-[11px] px-0 py-4 min-h-0">Description</div>
+          <div class="collapse-title label-caps text-[10px] px-0 py-3 min-h-0">Description</div>
           <div class="collapse-content px-0">
-            <p class="text-sm font-light leading-relaxed text-gray-500">{{ product.description }}</p>
+            <p class="text-xs font-light leading-relaxed text-gray-500">{{ product.description }}</p>
           </div>
         </div>
         <div class="collapse collapse-arrow bg-transparent rounded-none border-b border-maison-light-gray">
           <input type="checkbox" /> 
-          <div class="collapse-title label-caps text-[11px] px-0 py-4 min-h-0">Composition & Entretien</div>
+          <div class="collapse-title label-caps text-[10px] px-0 py-3 min-h-0">Composition & Entretien</div>
           <div class="collapse-content px-0">
-            <ul class="text-sm font-light space-y-2 text-gray-500">
+            <ul class="text-xs font-light space-y-1 text-gray-500">
               <li>• 100% Matière Premium</li>
               <li>• Lavage à la main recommandé</li>
               <li>• Conçu à Paris</li>
@@ -123,6 +122,7 @@
       </div>
     </div>
   </div>
+
 
   <!-- Reviews Section -->
   <div class="mt-48 pt-32 border-t border-maison-light-gray">

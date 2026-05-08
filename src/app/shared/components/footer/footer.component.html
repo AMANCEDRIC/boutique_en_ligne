@@ -2,12 +2,12 @@
   <div class="max-w-[1800px] mx-auto px-6 md:px-12">
     <div class="grid grid-cols-1 md:grid-cols-12 gap-16">
       <!-- Brand Column -->
-      <div class="md:col-span-4 space-y-6">
+      <div class="md:col-span-4 space-y-6 text-center md:text-left">
         <h3 class="text-xl font-serif tracking-[-0.05em] uppercase">Maison Shein</h3>
-        <p class="text-gray-500 text-xs font-light leading-relaxed max-w-xs">
+        <p class="text-gray-500 text-xs font-light leading-relaxed max-w-xs mx-auto md:mx-0">
           L'essence du luxe minimaliste. Des collections éditées avec soin pour une élégance intemporelle.
         </p>
-        <div class="flex gap-4 pt-2">
+        <div class="flex justify-center md:justify-start gap-4 pt-2">
            <a href="#" class="text-gray-500 hover:text-white transition-colors">
               <span class="label-caps text-[9px]">Instagram</span>
            </a>
@@ -20,63 +20,66 @@
         </div>
       </div>
 
-      <!-- Links Columns -->
-      <div class="md:col-span-2 space-y-4">
-        <h4 class="label-caps text-[9px] text-gray-300">Collections</h4>
-        <ul class="space-y-3 label-caps text-[8px] text-gray-500">
-          <li><a routerLink="/shop" class="hover:text-white transition-colors">Femme</a></li>
-          <li><a routerLink="/shop" class="hover:text-white transition-colors">Homme</a></li>
-          <li><a routerLink="/shop" class="hover:text-white transition-colors">Premium</a></li>
-          <li><a routerLink="/shop" class="hover:text-white transition-colors">Accessoires</a></li>
-        </ul>
-      </div>
+      <!-- Links Columns - Using grid-cols-2 on mobile for better space usage -->
+      <div class="md:col-span-6 grid grid-cols-2 md:grid-cols-3 gap-12 text-center md:text-left">
+        <div class="space-y-4">
+          <h4 class="label-caps text-[9px] text-gray-300">Collections</h4>
+          <ul class="space-y-3 label-caps text-[8px] text-gray-500">
+            <li><a routerLink="/shop" class="hover:text-white transition-colors">Femme</a></li>
+            <li><a routerLink="/shop" class="hover:text-white transition-colors">Homme</a></li>
+            <li><a routerLink="/shop" class="hover:text-white transition-colors">Premium</a></li>
+            <li><a routerLink="/shop" class="hover:text-white transition-colors">Accessoires</a></li>
+          </ul>
+        </div>
 
-      <div class="md:col-span-2 space-y-4">
-        <h4 class="label-caps text-[9px] text-gray-300">Maison</h4>
-        <ul class="space-y-3 label-caps text-[8px] text-gray-500">
-          <li><a href="#" class="hover:text-white transition-colors">Notre Histoire</a></li>
-          <li><a href="#" class="hover:text-white transition-colors">Lookbook</a></li>
-          <li><a href="#" class="hover:text-white transition-colors">Carrières</a></li>
-          <li><a href="#" class="hover:text-white transition-colors">Presse</a></li>
-        </ul>
-      </div>
+        <div class="space-y-4">
+          <h4 class="label-caps text-[9px] text-gray-300">Maison</h4>
+          <ul class="space-y-3 label-caps text-[8px] text-gray-500">
+            <li><a href="#" class="hover:text-white transition-colors">Histoire</a></li>
+            <li><a href="#" class="hover:text-white transition-colors">Lookbook</a></li>
+            <li><a href="#" class="hover:text-white transition-colors">Carrières</a></li>
+            <li><a href="#" class="hover:text-white transition-colors">Presse</a></li>
+          </ul>
+        </div>
 
-      <div class="md:col-span-2 space-y-4">
-        <h4 class="label-caps text-[9px] text-gray-300">Service Client</h4>
-        <ul class="space-y-3 label-caps text-[8px] text-gray-500">
-          <li><a href="#" class="hover:text-white transition-colors">Contact</a></li>
-          <li><a href="#" class="hover:text-white transition-colors">Livraison</a></li>
-          <li><a href="#" class="hover:text-white transition-colors">Retours & Échanges</a></li>
-          <li><a href="#" class="hover:text-white transition-colors">FAQ</a></li>
-        </ul>
+        <div class="space-y-4 col-span-2 md:col-span-1">
+          <h4 class="label-caps text-[9px] text-gray-300">Support</h4>
+          <ul class="space-y-3 label-caps text-[8px] text-gray-500">
+            <li><a href="#" class="hover:text-white transition-colors">Contact</a></li>
+            <li><a href="#" class="hover:text-white transition-colors">Livraison</a></li>
+            <li><a href="#" class="hover:text-white transition-colors">Retours</a></li>
+            <li><a href="#" class="hover:text-white transition-colors">FAQ</a></li>
+          </ul>
+        </div>
       </div>
 
       <!-- Newsletter -->
-      <div class="md:col-span-2 space-y-4">
+      <div class="md:col-span-2 space-y-4 text-center md:text-left">
         <h4 class="label-caps text-[9px] text-gray-300">Newsletter</h4>
         <div class="space-y-3">
           <input 
             type="email" 
             placeholder="VOTRE EMAIL" 
-            class="bg-transparent border-b border-white/20 w-full py-1 text-[8px] label-caps focus:border-white outline-none transition-colors"
+            class="bg-transparent border-b border-white/20 w-full py-1 text-[8px] label-caps focus:border-white outline-none transition-colors text-center md:text-left"
           >
           <button class="label-caps text-[8px] text-maison-gold hover:text-white transition-colors">S'inscrire →</button>
         </div>
       </div>
     </div>
 
-    <div class="border-t border-white/5 mt-16 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-      <p class="label-caps text-[7px] text-gray-600 tracking-[0.2em] uppercase">
+    <div class="border-t border-white/5 mt-16 pt-8 flex flex-col md:flex-row justify-between items-center gap-6">
+      <p class="label-caps text-[7px] text-gray-600 tracking-[0.2em] uppercase text-center">
         &copy; 2024 MAISON SHEIN. Tous droits réservés.
       </p>
-      <div class="flex gap-6 label-caps text-[7px] text-gray-600">
+      <div class="flex flex-wrap justify-center gap-6 label-caps text-[7px] text-gray-600">
          <a href="#" class="hover:text-white transition-colors">Confidentialité</a>
-         <a href="#" class="hover:text-white transition-colors">Conditions Générales</a>
+         <a href="#" class="hover:text-white transition-colors">Conditions</a>
          <a href="#" class="hover:text-white transition-colors">Cookies</a>
       </div>
     </div>
   </div>
 </footer>
+
 
 
 
