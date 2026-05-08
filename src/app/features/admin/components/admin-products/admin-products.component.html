@@ -1,0 +1,119 @@
+<div class="space-y-16">
+  <!-- Add Product Section -->
+  <div class="bg-white p-12 border border-maison-light-gray shadow-ambient">
+    <h4 class="label-caps text-[11px] mb-10 text-maison-gold">Ajouter une nouvelle pièce</h4>
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-10">
+      <div class="space-y-2">
+        <label class="label-caps text-[8px] text-gray-400">Nom du produit</label>
+        <input
+          type="text"
+          placeholder="EX: ROBE SOIE"
+          class="input-premium w-full text-xs uppercase tracking-widest py-3"
+          [(ngModel)]="newProduct.name"
+          name="name"
+        />
+      </div>
+
+      <div class="space-y-2">
+        <label class="label-caps text-[8px] text-gray-400">Prix (FCFA)</label>
+        <input
+          type="number"
+          placeholder="0"
+          class="input-premium w-full text-xs py-3"
+          [(ngModel)]="newProduct.price"
+          name="price"
+        />
+      </div>
+
+      <div class="space-y-2">
+        <label class="label-caps text-[8px] text-gray-400">Collection</label>
+        <select
+          class="input-premium w-full text-xs uppercase tracking-widest py-3 bg-transparent"
+          [(ngModel)]="newProduct.category"
+          name="category"
+        >
+          <option value="Femme">Femme</option>
+          <option value="Homme">Homme</option>
+          <option value="Accessoires">Accessoires</option>
+          <option value="Premium">Premium</option>
+        </select>
+      </div>
+
+      <div class="flex items-end">
+        <button
+          (click)="onAddProduct()"
+          class="w-full bg-black text-white py-4 label-caps text-[10px] hover:bg-black/90 transition-all shadow-lg"
+        >
+          Enregistrer
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Product List -->
+  <div class="bg-white border border-maison-light-gray shadow-ambient overflow-hidden">
+    <table class="w-full text-left">
+      <thead>
+        <tr class="border-b border-maison-light-gray">
+          <th class="px-10 py-6 label-caps text-[10px] text-gray-400">Article</th>
+          <th class="px-10 py-6 label-caps text-[10px] text-gray-400">Collection</th>
+          <th class="px-10 py-6 label-caps text-[10px] text-gray-400">Prix</th>
+          <th class="px-10 py-6 label-caps text-[10px] text-gray-400">État du Stock</th>
+          <th class="px-10 py-6 label-caps text-[10px] text-gray-400 text-right">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-maison-light-gray">
+        <tr
+          *ngFor="let p of products"
+          class="group hover:bg-maison-greige/30 transition-colors"
+        >
+          <td class="px-10 py-6 flex items-center gap-6">
+            <div class="w-12 h-16 bg-maison-greige overflow-hidden border border-maison-light-gray">
+               <img [src]="p.image" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" alt="" />
+            </div>
+            <span class="label-caps text-[11px] text-black tracking-normal">{{ p.name }}</span>
+          </td>
+          <td class="px-10 py-6">
+            <span class="label-caps text-[9px] text-gray-400 border border-maison-light-gray px-3 py-1">{{ p.category }}</span>
+          </td>
+          <td class="px-10 py-6 font-sans text-sm tracking-tighter">
+            {{ formatPriceFn(p.price) }}
+          </td>
+          <td class="px-10 py-6">
+            <div class="space-y-3 min-w-[150px]">
+              <div class="flex justify-between items-baseline">
+                <span class="label-caps text-[8px]" [ngClass]="p.stock < 10 ? 'text-red-500' : 'text-gray-400'">{{ p.stock }} PIÈCES</span>
+                <span class="text-[9px] font-sans text-gray-300">{{ getStockPercentage(p.stock) | number:'1.0-0' }}%</span>
+              </div>
+              <div class="w-full bg-maison-greige h-1">
+                <div
+                  class="h-full transition-all duration-1000"
+                  [ngClass]="p.stock < 10 ? 'bg-red-500' : 'bg-black'"
+                  [style.width.%]="getStockPercentage(p.stock)"
+                ></div>
+              </div>
+            </div>
+          </td>
+          <td class="px-10 py-6 text-right">
+            <div class="flex items-center justify-end gap-2">
+              <button
+                (click)="onEditProduct(p)"
+                class="p-2 text-gray-300 hover:text-black transition-colors"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="1.2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+              </button>
+              <button
+                (click)="onDeleteProduct(p)"
+                class="p-2 text-gray-300 hover:text-red-500 transition-colors"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="1.2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+

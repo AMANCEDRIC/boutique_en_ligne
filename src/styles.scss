@@ -1,1 +1,93 @@
 /* You can add global styles to this file, and also import other style files */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  h1, .h1-editorial {
+    @apply font-serif text-[48px] font-normal leading-[1.1] tracking-[-0.02em];
+  }
+  h2, .h2-editorial {
+    @apply font-serif text-[32px] font-normal leading-[1.2] tracking-[-0.01em];
+  }
+  h3, .h3-ui {
+    @apply font-sans text-[20px] font-semibold leading-[1.4] tracking-[0.02em];
+  }
+  body {
+    @apply font-sans text-base font-normal leading-[1.6] tracking-normal;
+  }
+}
+
+@layer components {
+  /* Sharp Edges for Premium Look */
+  .btn, .card, .input, .select, .textarea, .badge, .modal-box {
+    @apply rounded-none;
+  }
+
+  /* Ambient Shadow */
+  .shadow-ambient {
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05);
+  }
+
+  /* Premium Underline Input */
+  .input-premium {
+    @apply border-0 border-b border-maison-light-gray focus:border-black focus:outline-none bg-transparent px-0;
+  }
+
+  /* Label Caps */
+  .label-caps {
+    @apply font-sans text-[12px] font-bold uppercase tracking-[0.1em];
+  }
+}
+
+/* Smooth Transitions */
+* {
+  @apply transition-all duration-300 ease-in-out;
+}
+
+/* Custom Scrollbar for Luxury Feel */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  @apply bg-maison-greige;
+}
+::-webkit-scrollbar-thumb {
+  @apply bg-black;
+}
+
+/* Custom Animations */
+@keyframes scroll-line {
+  0% { transform: scaleY(0); transform-origin: top; }
+  50% { transform: scaleY(1); transform-origin: top; }
+  50.1% { transform: scaleY(1); transform-origin: bottom; }
+  100% { transform: scaleY(0); transform-origin: bottom; }
+}
+
+.animate-scroll-line {
+  animation: scroll-line 2s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+}
+
+.animate-in {
+  animation-duration: 1s;
+  animation-fill-mode: both;
+}
+
+.fade-in {
+  animation-name: fadeIn;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.slide-in-from-bottom-10 {
+  animation-name: slideInBottom;
+}
+
+@keyframes slideInBottom {
+  from { transform: translateY(40px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+

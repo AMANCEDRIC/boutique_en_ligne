@@ -1,0 +1,85 @@
+<div class="max-w-7xl mx-auto px-4 md:px-8 py-24">
+  <h2 class="text-5xl font-serif mb-16 text-center uppercase">
+    Ma Wishlist
+  </h2>
+
+  <div *ngIf="wishlist.length === 0; else wishlistContent" class="text-center py-32 bg-gray-50 rounded-lg">
+    <p class="text-gray-400 font-serif text-xl italic mb-8">
+      Votre wishlist est vide.
+    </p>
+    <button
+      (click)="goToShop()"
+      class="bg-black text-white px-12 py-5 uppercase text-xs tracking-widest font-bold"
+    >
+      Découvrir la collection
+    </button>
+  </div>
+
+  <ng-template #wishlistContent>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+      <div
+        *ngFor="let product of wishlist"
+        class="group relative cursor-pointer"
+        (click)="goToProduct(product)"
+      >
+        <!-- Image produit -->
+        <div class="relative aspect-[3/4] overflow-hidden bg-gray-50 mb-6">
+          <img
+            [src]="product.image"
+            class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
+            [alt]="product.name"
+          />
+          <!-- Badge "New" si applicable -->
+          <span *ngIf="product.isNew" class="absolute top-4 left-4 bg-black text-white text-[9px] px-3 py-1 font-bold uppercase tracking-widest">
+            New
+          </span>
+          <!-- Badge "Sale" si applicable -->
+          <span *ngIf="product.isSale" class="absolute top-4 right-4 bg-red-500 text-white text-[9px] px-3 py-1 font-bold uppercase tracking-widest">
+            Offre
+          </span>
+          <!-- Bouton cœur (retirer de la wishlist) -->
+          <button
+            (click)="toggleWishlist(product, $event)"
+            class="absolute top-4 right-4 p-3 bg-white rounded-full shadow-sm hover:bg-gray-100 transition-colors z-10"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5 text-red-500 fill-current"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="1.5"
+                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+              />
+            </svg>
+          </button>
+        </div>
+
+        <!-- Infos produit -->
+        <div>
+          <h4 class="text-sm font-bold uppercase tracking-tight group-hover:text-gray-500 transition-colors">
+            {{ product.name }}
+          </h4>
+          <p class="text-gray-400 text-xs mt-1 tracking-widest uppercase">
+            {{ product.category }}
+          </p>
+          <div class="flex justify-between items-end mt-3">
+            <p class="font-bold text-sm">
+              {{ formatPrice(product.price) }}
+            </p>
+            <p
+              class="text-[9px] font-bold uppercase tracking-widest"
+              [ngClass]="product.stock <= 5 ? 'text-red-500' : 'text-gray-400'"
+            >
+              {{ product.stock === 0 ? 'Épuisé' : product.stock + ' en stock' }}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</div>
+

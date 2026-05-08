@@ -1,0 +1,98 @@
+<div class="max-w-[1800px] mx-auto px-6 md:px-12 py-20">
+  <!-- Shop Header -->
+  <div class="flex flex-col md:flex-row justify-between items-end mb-20 gap-8">
+    <div class="space-y-4">
+      <h1 class="h1-editorial uppercase">Collection</h1>
+      <p class="label-caps text-[10px] text-gray-400">
+        {{ filteredProducts.length }} Pièces sélectionnées
+      </p>
+    </div>
+    
+    <!-- Sorting & Filters Toggle (Mobile) -->
+    <div class="flex items-center gap-8 w-full md:w-auto border-t border-maison-light-gray md:border-none pt-6 md:pt-0">
+      <div class="flex items-center gap-4">
+        <span class="label-caps text-[9px] text-gray-400">Trier par:</span>
+        <select 
+          [value]="sortBy"
+          (change)="onSortChange($any($event.target).value)"
+          class="bg-transparent label-caps text-[11px] border-none focus:ring-0 cursor-pointer p-0 pr-8"
+        >
+          <option value="newest">Nouveautés</option>
+          <option value="price-asc">Prix croissant</option>
+          <option value="price-desc">Prix décroissant</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex flex-col lg:flex-row gap-20">
+    <!-- Sidebar Filters -->
+    <aside class="lg:w-64 flex-shrink-0 space-y-16">
+      <!-- Categories -->
+      <div class="space-y-8">
+        <h4 class="label-caps text-[11px]">Catégories</h4>
+        <div class="space-y-4">
+          <button 
+            *ngFor="let cat of ['all', 'Femme', 'Homme', 'Accessoires', 'Premium']"
+            (click)="onCategoryChange(cat)"
+            [ngClass]="selectedCategory === cat ? 'text-black' : 'text-gray-400'"
+            class="block label-caps text-[10px] hover:text-black transition-colors relative group"
+          >
+            {{ cat === 'all' ? 'Tout voir' : cat }}
+            <span class="absolute -left-4 top-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-maison-gold rounded-full transition-transform duration-300"
+                  [ngClass]="selectedCategory === cat ? 'scale-100' : 'scale-0 group-hover:scale-50'"></span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Sizes -->
+      <div class="space-y-8">
+        <h4 class="label-caps text-[11px]">Tailles</h4>
+        <div class="grid grid-cols-4 gap-2">
+          <button 
+            *ngFor="let size of ['XS', 'S', 'M', 'L', 'XL']"
+            (click)="toggleSize(size)"
+            [ngClass]="selectedSize === size ? 'bg-black text-white' : 'border border-maison-light-gray text-gray-400 hover:border-black hover:text-black'"
+            class="aspect-square flex items-center justify-center text-[10px] font-sans tracking-widest transition-all"
+          >
+            {{ size }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Price Range (Simplified) -->
+      <div class="space-y-8">
+        <h4 class="label-caps text-[11px]">Prix</h4>
+        <div class="space-y-4">
+          <input type="range" min="0" max="1000" class="w-full accent-black h-1 bg-maison-greige appearance-none cursor-pointer">
+          <div class="flex justify-between label-caps text-[9px] text-gray-400">
+            <span>0€</span>
+            <span>1000€</span>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Product Grid -->
+    <div class="flex-grow">
+      <div *ngIf="filteredProducts.length > 0; else noResults" 
+           class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-8 gap-y-20">
+        <app-product-card
+          *ngFor="let product of filteredProducts"
+          [product]="product"
+          (addToCart)="onAddToCart($event)"
+          (toggleWishlist)="onToggleWishlist($event)"
+        ></app-product-card>
+      </div>
+      
+      <ng-template #noResults>
+        <div class="text-center py-32 space-y-6">
+          <p class="font-serif text-2xl italic text-gray-400">Aucune pièce ne correspond à votre sélection.</p>
+          <button (click)="onCategoryChange('all')" class="label-caps border-b border-black pb-1">Réinitialiser les filtres</button>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+</div>
+
+

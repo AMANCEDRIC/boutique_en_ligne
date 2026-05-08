@@ -1,0 +1,137 @@
+<div class="max-w-[1200px] mx-auto px-6 md:px-12 py-32">
+  <div class="flex flex-col md:flex-row justify-between items-end mb-24 gap-8">
+    <h1 class="h1-editorial uppercase">Votre Sélection</h1>
+    <p class="label-caps text-[10px] text-gray-400">Total de {{ cartItems.length }} articles</p>
+  </div>
+
+  <div *ngIf="cartItems.length === 0; else cartContent" class="text-center py-48 bg-maison-greige space-y-12">
+    <p class="font-serif text-2xl italic text-gray-400">
+      Votre panier est actuellement vide.
+    </p>
+    <button
+      (click)="goToShop()"
+      class="bg-black text-white px-20 py-5 label-caps text-[11px] hover:opacity-80 transition-all"
+    >
+      Découvrir la collection
+    </button>
+  </div>
+
+  <ng-template #cartContent>
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-20">
+      <!-- Items List -->
+      <div class="lg:col-span-8 space-y-12">
+        <div
+          *ngFor="let item of cartItems; let idx = index"
+          class="flex flex-col sm:flex-row gap-10 border-b border-maison-light-gray pb-12 group"
+        >
+          <!-- Product Image -->
+          <div class="w-32 h-44 flex-shrink-0 bg-maison-greige overflow-hidden">
+            <img
+              [src]="item.image"
+              class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+              [alt]="item.name"
+            />
+          </div>
+
+          <!-- Product Details -->
+          <div class="flex-1 space-y-6">
+            <div class="flex justify-between items-start">
+              <div class="space-y-2">
+                <h4 class="label-caps text-[12px] text-black">
+                  {{ item.name }}
+                </h4>
+                <p class="label-caps text-[9px] text-gray-400">
+                  Taille: <span class="text-black ml-2">{{ item.selectedSize }}</span>
+                </p>
+              </div>
+              <button
+                (click)="removeFromCart(item)"
+                class="text-gray-300 hover:text-black transition-colors"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <div class="flex justify-between items-end">
+              <!-- Quantity Selector -->
+              <div class="flex items-center border border-maison-light-gray h-10">
+                <button
+                  (click)="updateQuantity(item, -1)"
+                  class="w-10 h-full hover:bg-maison-greige transition-colors text-sm font-light"
+                >
+                  -
+                </button>
+                <span class="w-12 h-full flex items-center justify-center text-xs font-sans border-x border-maison-light-gray">
+                  {{ item.quantity }}
+                </span>
+                <button
+                  (click)="updateQuantity(item, 1)"
+                  class="w-10 h-full hover:bg-maison-greige transition-colors text-sm font-light"
+                >
+                  +
+                </button>
+              </div>
+              
+              <p class="font-sans text-lg tracking-tight">
+                {{ formatPrice(item.price * item.quantity) }}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Order Summary -->
+      <div class="lg:col-span-4">
+        <div class="bg-maison-greige p-10 space-y-12 sticky top-32">
+          <h3 class="label-caps text-[12px] border-b border-maison-light-gray pb-6">Résumé de la commande</h3>
+          
+          <div class="space-y-6">
+            <div class="flex justify-between label-caps text-[10px] text-gray-500">
+              <span>Sous-total</span>
+              <span>{{ formatPrice(totalCart) }}</span>
+            </div>
+            <div class="flex justify-between label-caps text-[10px] text-gray-500">
+              <span>Livraison</span>
+              <span class="text-maison-gold">Offerte</span>
+            </div>
+            <div class="pt-6 border-t border-maison-light-gray flex justify-between items-baseline">
+              <span class="label-caps text-[12px]">Total</span>
+              <span class="text-2xl font-sans tracking-tighter">{{ formatPrice(totalCart) }}</span>
+            </div>
+          </div>
+
+          <div class="space-y-4 pt-10">
+            <button
+              (click)="goToCheckout()"
+              class="w-full bg-black text-white py-5 label-caps text-[11px] hover:bg-black/90 transition-all"
+            >
+              Procéder au paiement
+            </button>
+            <button
+              (click)="goToShop()"
+              class="w-full label-caps text-[9px] text-gray-400 hover:text-black transition-colors"
+            >
+              Continuer mes achats
+            </button>
+          </div>
+          
+          <!-- Reassurance -->
+          <div class="pt-10 space-y-4 border-t border-maison-light-gray">
+            <div class="flex items-center gap-4 text-[9px] label-caps text-gray-400">
+               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="1" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+               Paiement sécurisé
+            </div>
+            <div class="flex items-center gap-4 text-[9px] label-caps text-gray-400">
+               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="1" d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><path stroke-width="1" d="M22 6l-10 7L2 6"/></svg>
+               Livraison premium
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</div>
+
+

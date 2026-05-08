@@ -1,0 +1,49 @@
+<div class="min-h-screen bg-white flex">
+  <app-admin-sidebar
+    [activeTab]="activeTab"
+    (tabChange)="setActiveTab($event)"
+  ></app-admin-sidebar>
+
+  <div class="flex-1 p-16 overflow-auto md:ml-64">
+    <div class="flex justify-between items-center mb-16">
+      <h3 class="h1-editorial text-4xl uppercase tracking-tighter">
+        <ng-container [ngSwitch]="activeTab">
+          <span *ngSwitchCase="'stats'">Performance</span>
+          <span *ngSwitchCase="'products'">Catalogue</span>
+          <span *ngSwitchCase="'orders'">Commandes</span>
+        </ng-container>
+      </h3>
+      
+      <div class="flex items-center gap-4">
+         <span class="label-caps text-[9px] text-gray-400">Admin Session</span>
+         <div class="w-8 h-8 bg-black flex items-center justify-center text-[10px] text-white label-caps">A</div>
+      </div>
+    </div>
+
+    <div class="max-w-[1400px]">
+      <app-admin-stats
+        *ngIf="activeTab === 'stats'"
+        [products]="products"
+        [formatPriceFn]="formatPrice.bind(this)"
+        [totalStock]="totalStock"
+      ></app-admin-stats>
+
+      <app-admin-products
+        *ngIf="activeTab === 'products'"
+        [products]="products"
+        (addProduct)="addProduct($event)"
+        (deleteProduct)="deleteProduct($event.id, $event.name)"
+        (editProduct)="editProduct($event)"
+        [formatPriceFn]="formatPrice.bind(this)"
+      ></app-admin-products>
+
+      <app-admin-orders
+        *ngIf="activeTab === 'orders'"
+        [orders]="orders"
+        [formatPriceFn]="formatPrice.bind(this)"
+      ></app-admin-orders>
+    </div>
+  </div>
+</div>
+
+

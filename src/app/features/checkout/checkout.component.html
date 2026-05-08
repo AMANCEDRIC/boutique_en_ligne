@@ -1,0 +1,143 @@
+<div class="max-w-[1400px] mx-auto px-6 md:px-12 py-32">
+  <button
+    (click)="goBack()"
+    class="mb-12 label-caps text-[10px] text-gray-400 hover:text-black transition-colors"
+  >
+    ← Retour au panier
+  </button>
+
+  <h1 class="h1-editorial uppercase mb-24 text-center">Finalisation</h1>
+
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-24">
+    <!-- Delivery Form -->
+    <div class="lg:col-span-7 space-y-12">
+      <h2 class="h2-editorial text-2xl uppercase border-b border-maison-light-gray pb-6">Expédition</h2>
+
+      <form (ngSubmit)="submitOrder()" class="space-y-12">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+          <!-- Full Name -->
+          <div class="space-y-2">
+            <label for="name" class="label-caps text-[10px]">Nom complet <span class="text-maison-gold">*</span></label>
+            <input
+              type="text"
+              id="name"
+              name="name"
+              [(ngModel)]="customerName"
+              required
+              class="input-premium w-full text-xs uppercase tracking-widest py-4"
+              placeholder="VOTRE NOM"
+            />
+          </div>
+
+          <!-- Email -->
+          <div class="space-y-2">
+            <label for="email" class="label-caps text-[10px]">Email</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              [(ngModel)]="customerEmail"
+              class="input-premium w-full text-xs uppercase tracking-widest py-4"
+              placeholder="VOTRE@EMAIL.COM"
+            />
+          </div>
+
+          <!-- Phone -->
+          <div class="space-y-2">
+            <label for="phone" class="label-caps text-[10px]">Téléphone <span class="text-maison-gold">*</span></label>
+            <input
+              type="tel"
+              id="phone"
+              name="phone"
+              [(ngModel)]="customerPhone"
+              required
+              class="input-premium w-full text-xs uppercase tracking-widest py-4"
+              placeholder="+225 XX XX XX XX XX"
+            />
+          </div>
+
+          <!-- Address -->
+          <div class="space-y-2">
+            <label for="address" class="label-caps text-[10px]">Localité / Ville <span class="text-maison-gold">*</span></label>
+            <input
+              type="text"
+              id="address"
+              name="address"
+              [(ngModel)]="customerAddress"
+              required
+              class="input-premium w-full text-xs uppercase tracking-widest py-4"
+              placeholder="VOTRE VILLE"
+            />
+          </div>
+        </div>
+
+        <div class="pt-12">
+          <button
+            type="submit"
+            [disabled]="isSubmitting || cartItems.length === 0"
+            class="w-full bg-black text-white py-6 label-caps text-[12px] hover:bg-black/90 transition-all disabled:opacity-50"
+          >
+            {{ isSubmitting ? 'Traitement en cours...' : 'Confirmer la commande' }}
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Summary -->
+    <div class="lg:col-span-5">
+      <div class="bg-maison-greige p-10 space-y-12 sticky top-32">
+        <h3 class="label-caps text-[12px] border-b border-maison-light-gray pb-6">Votre commande</h3>
+
+        <!-- Items List -->
+        <div class="space-y-8 max-h-[40vh] overflow-y-auto pr-4 custom-scrollbar">
+          <div
+            *ngFor="let item of cartItems"
+            class="flex gap-6 pb-6 border-b border-maison-light-gray last:border-0"
+          >
+            <div class="w-20 h-28 flex-shrink-0 bg-white overflow-hidden">
+              <img
+                [src]="item.image"
+                [alt]="item.name"
+                class="w-full h-full object-cover"
+              />
+            </div>
+            <div class="flex-1 space-y-2">
+              <h4 class="label-caps text-[10px] text-black">
+                {{ item.name }}
+              </h4>
+              <p class="label-caps text-[8px] text-gray-400">
+                Qté: {{ item.quantity }} • Taille: {{ item.selectedSize }}
+              </p>
+              <p class="font-sans text-sm mt-2">
+                {{ formatPrice(item.price * item.quantity) }}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Totals -->
+        <div class="space-y-6 pt-6 border-t border-black">
+          <div class="flex justify-between label-caps text-[10px] text-gray-500">
+            <span>Sous-total</span>
+            <span>{{ formatPrice(totalCart) }}</span>
+          </div>
+          <div class="flex justify-between label-caps text-[10px] text-gray-500">
+            <span>Livraison</span>
+            <span class="text-maison-gold uppercase">Gratuit</span>
+          </div>
+          <div class="flex justify-between items-baseline pt-4">
+            <span class="label-caps text-[13px]">Total</span>
+            <span class="text-3xl font-sans tracking-tighter">{{ formatPrice(totalCart) }}</span>
+          </div>
+        </div>
+        
+        <!-- Trust badge -->
+        <div class="text-center">
+           <p class="label-caps text-[8px] text-gray-400 italic">Paiement à la livraison disponible</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+

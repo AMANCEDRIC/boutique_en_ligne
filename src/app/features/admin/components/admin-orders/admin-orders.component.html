@@ -1,0 +1,48 @@
+<div class="bg-white border border-maison-light-gray shadow-ambient overflow-hidden">
+  <table class="w-full text-left">
+    <thead>
+      <tr class="border-b border-maison-light-gray">
+        <th class="px-10 py-6 label-caps text-[10px] text-gray-400 tracking-[0.2em]">Référence</th>
+        <th class="px-10 py-6 label-caps text-[10px] text-gray-400 tracking-[0.2em]">Date</th>
+        <th class="px-10 py-6 label-caps text-[10px] text-gray-400 tracking-[0.2em]">Client</th>
+        <th class="px-10 py-6 label-caps text-[10px] text-gray-400 tracking-[0.2em]">Montant</th>
+        <th class="px-10 py-6 label-caps text-[10px] text-gray-400 text-center tracking-[0.2em]">Statut</th>
+        <th class="px-10 py-6 label-caps text-[10px] text-gray-400 text-right tracking-[0.2em]">Actions</th>
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-maison-light-gray">
+      <tr
+        *ngFor="let o of orders"
+        class="group hover:bg-maison-greige/30 transition-colors"
+      >
+        <td class="px-10 py-6 font-mono text-xs text-gray-400">#{{ o.id }}</td>
+        <td class="px-10 py-6 label-caps text-[10px] tracking-normal">{{ o.date }}</td>
+        <td class="px-10 py-6 label-caps text-[11px] text-black tracking-normal">{{ o.customerName }}</td>
+        <td class="px-10 py-6 font-sans text-sm tracking-tighter">{{ formatPriceFn(o.total) }}</td>
+        <td class="px-10 py-6 text-center">
+          <span
+            class="px-4 py-1.5 label-caps text-[8px] border inline-block"
+            [ngClass]="{
+              'border-blue-200 text-blue-500 bg-blue-50/30': o.status === 'Expédié',
+              'border-maison-gold/50 text-maison-gold bg-maison-gold/5': o.status === 'En attente',
+              'border-green-200 text-green-600 bg-green-50/30': o.status === 'Livré',
+              'border-red-200 text-red-500 bg-red-50/30': o.status === 'Annulé'
+            }"
+          >
+            {{ o.status }}
+          </span>
+        </td>
+        <td class="px-10 py-6 text-right">
+          <a
+            [routerLink]="['/admin/order', o.id]"
+            class="label-caps text-[9px] text-gray-400 hover:text-black transition-colors border-b border-transparent hover:border-black"
+          >
+            Détails
+          </a>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+

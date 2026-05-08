@@ -1,0 +1,52 @@
+<div class="space-y-12">
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+    <!-- Stat Card -->
+    <div class="bg-white p-10 border border-maison-light-gray shadow-ambient">
+      <p class="label-caps text-[10px] text-gray-400 mb-6 tracking-[0.2em]">Chiffre d'Affaires</p>
+      <p class="text-4xl font-sans tracking-tighter">{{ formatPriceFn(1245000) }}</p>
+      <div class="mt-6 flex items-center gap-2">
+        <span class="text-green-500 text-[10px] font-bold">↑ 12%</span>
+        <span class="label-caps text-[8px] text-gray-300">vs mois dernier</span>
+      </div>
+    </div>
+
+    <!-- Stat Card -->
+    <div class="bg-white p-10 border border-maison-light-gray shadow-ambient">
+      <p class="label-caps text-[10px] text-gray-400 mb-6 tracking-[0.2em]">Commandes Totales</p>
+      <p class="text-4xl font-sans tracking-tighter">342</p>
+      <div class="mt-6 flex items-center gap-2">
+        <span class="text-maison-gold text-[10px] font-bold">●</span>
+        <span class="label-caps text-[8px] text-gray-300">En progression</span>
+      </div>
+    </div>
+
+    <!-- Stat Card -->
+    <div class="bg-white p-10 border border-maison-light-gray shadow-ambient">
+      <p class="label-caps text-[10px] text-gray-400 mb-6 tracking-[0.2em]">Stock Actuel</p>
+      <p class="text-4xl font-sans tracking-tighter">{{ totalStock }}</p>
+      <div class="mt-6 flex items-center gap-2">
+        <span class="text-orange-400 text-[10px] font-bold">!</span>
+        <span class="label-caps text-[8px] text-gray-300">8 articles en rupture</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Analytics Viewport -->
+  <div class="bg-white border border-maison-light-gray shadow-ambient">
+    <div class="p-10 border-b border-maison-light-gray flex justify-between items-center">
+       <h4 class="label-caps text-[11px]">Analyse des Ventes</h4>
+       <div class="flex gap-4">
+          <button class="label-caps text-[9px] border-b border-black pb-1">7 Jours</button>
+          <button class="label-caps text-[9px] text-gray-300 hover:text-black transition-colors">30 Jours</button>
+       </div>
+    </div>
+    <div class="h-[500px] bg-maison-greige/30 flex items-center justify-center p-20">
+      <div class="w-full h-full border border-dashed border-gray-200 flex flex-col items-center justify-center space-y-6">
+        <div class="w-12 h-12 border-2 border-maison-gold rounded-full border-t-transparent animate-spin opacity-20"></div>
+        <p class="label-caps text-[10px] text-gray-400">Génération du rapport analytique...</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+

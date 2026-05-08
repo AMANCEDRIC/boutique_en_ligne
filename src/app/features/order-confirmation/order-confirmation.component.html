@@ -1,0 +1,120 @@
+<div *ngIf="order" class="max-w-4xl mx-auto px-4 md:px-8 py-24">
+  <!-- Message de succès -->
+  <div class="text-center mb-16">
+    <div class="inline-flex items-center justify-center w-20 h-20 bg-green-100 rounded-full mb-6">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="h-12 w-12 text-green-500"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M5 13l4 4L19 7"
+        />
+      </svg>
+    </div>
+    <h1 class="text-5xl font-serif uppercase mb-4 tracking-tight">
+      Commande confirmée !
+    </h1>
+    <p class="text-gray-600 text-lg">
+      Merci pour votre achat. Votre commande a été enregistrée avec succès.
+    </p>
+  </div>
+
+  <!-- Numéro de commande -->
+  <div class="bg-black text-white rounded-2xl p-8 mb-12 text-center">
+    <p class="text-[10px] font-bold uppercase tracking-[0.3em] text-gray-400 mb-2">
+      Numéro de commande
+    </p>
+    <p class="text-4xl font-serif tracking-tight">{{ order.id }}</p>
+  </div>
+
+  <!-- Détails de la commande -->
+  <div class="space-y-8 mb-12">
+    <!-- Informations client -->
+    <div class="bg-gray-50 rounded-2xl p-8">
+      <h2 class="text-xl font-serif uppercase mb-6 tracking-tight">
+        Informations de livraison
+      </h2>
+      <div class="space-y-3">
+        <div>
+          <span class="text-[10px] font-bold uppercase tracking-widest text-gray-400">
+            Nom :
+          </span>
+          <p class="text-sm font-bold mt-1">{{ order.customerName }}</p>
+        </div>
+        <div>
+          <span class="text-[10px] font-bold uppercase tracking-widest text-gray-400">
+            Date :
+          </span>
+          <p class="text-sm font-bold mt-1">{{ order.date }}</p>
+        </div>
+        <div>
+          <span class="text-[10px] font-bold uppercase tracking-widest text-gray-400">
+            Statut :
+          </span>
+          <p class="text-sm font-bold mt-1">{{ order.status }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Articles commandés -->
+    <div class="bg-gray-50 rounded-2xl p-8">
+      <h2 class="text-xl font-serif uppercase mb-6 tracking-tight">
+        Articles commandés
+      </h2>
+      <div class="space-y-4">
+        <div
+          *ngFor="let item of order.items"
+          class="flex items-center space-x-4 pb-4 border-b border-gray-200 last:border-0"
+        >
+          <img
+            [src]="item.image"
+            [alt]="item.name"
+            class="w-20 h-28 object-cover bg-gray-100 rounded-lg"
+          />
+          <div class="flex-1">
+            <h4 class="font-bold text-sm uppercase tracking-tight">
+              {{ item.name }}
+            </h4>
+            <p class="text-[10px] text-gray-400 uppercase tracking-widest mt-1">
+              Taille: {{ item.selectedSize }} • Qté: {{ item.quantity }}
+            </p>
+            <p class="font-bold text-sm mt-2">
+              {{ formatPrice(item.price * item.quantity) }}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Total -->
+      <div class="pt-6 mt-6 border-t-2 border-black">
+        <div class="flex justify-between items-baseline">
+          <span class="text-xl font-serif uppercase tracking-tight">Total</span>
+          <span class="text-2xl font-bold">{{ formatPrice(order.total) }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Actions -->
+  <div class="flex flex-col sm:flex-row gap-4 justify-center">
+    <button
+      (click)="goToShop()"
+      class="px-8 py-4 bg-black text-white font-bold uppercase tracking-widest text-xs hover:bg-gray-800 transition-colors rounded-lg"
+    >
+      Continuer mes achats
+    </button>
+    <button
+      (click)="goToHome()"
+      class="px-8 py-4 border border-gray-200 text-gray-400 font-bold uppercase tracking-widest text-xs hover:border-black hover:text-black transition-colors rounded-lg"
+    >
+      Retour à l'accueil
+    </button>
+  </div>
+</div>
+
