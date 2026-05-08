@@ -1,51 +1,83 @@
 <div class="space-y-16">
+  <!-- Inventory Summary -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+    <div class="bg-black text-white p-8 border border-white/5">
+      <p class="label-caps text-[9px] text-gray-500 mb-2">Total Inventaire</p>
+      <p class="text-3xl font-serif">{{ products.length }} Articles</p>
+    </div>
+    <div class="bg-maison-greige p-8 border border-maison-light-gray">
+      <p class="label-caps text-[9px] text-gray-400 mb-2">Pièces en Stock</p>
+      <p class="text-3xl font-serif text-black">{{ getTotalStockPieces() }} Unités</p>
+    </div>
+    <div class="bg-maison-greige p-8 border border-maison-light-gray">
+      <p class="label-caps text-[9px] text-gray-400 mb-2">Alerte Stock Bas</p>
+      <p class="text-3xl font-serif text-red-500">{{ getLowStockCount() }} Articles</p>
+    </div>
+  </div>
+
   <!-- Add Product Section -->
   <div class="bg-white p-12 border border-maison-light-gray shadow-ambient">
     <h4 class="label-caps text-[11px] mb-10 text-maison-gold">Ajouter une nouvelle pièce</h4>
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-10">
-      <div class="space-y-2">
-        <label class="label-caps text-[8px] text-gray-400">Nom du produit</label>
-        <input
-          type="text"
-          placeholder="EX: ROBE SOIE"
-          class="input-premium w-full text-xs uppercase tracking-widest py-3"
-          [(ngModel)]="newProduct.name"
-          name="name"
-        />
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
+
+      <!-- Image Upload Preview -->
+      <div class="lg:col-span-3 space-y-4">
+        <div
+          class="aspect-[3/4] bg-maison-greige border border-dashed border-maison-light-gray flex flex-col items-center justify-center relative group overflow-hidden">
+          <img *ngIf="newProduct.image" [src]="newProduct.image" class="absolute inset-0 w-full h-full object-cover" />
+          <div
+            class="z-10 text-center p-4 bg-white/80 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity">
+            <p class="label-caps text-[8px]">Changer l'image</p>
+          </div>
+          <input type="file" (change)="onFileSelected($event)" class="absolute inset-0 opacity-0 cursor-pointer z-20"
+            accept="image/*" />
+          <div *ngIf="!newProduct.image" class="text-center space-y-2">
+            <svg class="w-6 h-6 mx-auto text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-width="1.2" d="M12 4v16m8-8H4" />
+            </svg>
+            <p class="label-caps text-[8px] text-gray-400">Ajouter Image</p>
+          </div>
+        </div>
       </div>
 
-      <div class="space-y-2">
-        <label class="label-caps text-[8px] text-gray-400">Prix (FCFA)</label>
-        <input
-          type="number"
-          placeholder="0"
-          class="input-premium w-full text-xs py-3"
-          [(ngModel)]="newProduct.price"
-          name="price"
-        />
-      </div>
+      <!-- Form Fields -->
+      <div class="lg:col-span-9 grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div class="space-y-2">
+          <label class="label-caps text-[8px] text-gray-400">Nom du produit</label>
+          <input type="text" placeholder="EX: ROBE SOIE"
+            class="input-premium w-full text-xs uppercase tracking-widest py-3" [(ngModel)]="newProduct.name"
+            name="name" />
+        </div>
 
-      <div class="space-y-2">
-        <label class="label-caps text-[8px] text-gray-400">Collection</label>
-        <select
-          class="input-premium w-full text-xs uppercase tracking-widest py-3 bg-transparent"
-          [(ngModel)]="newProduct.category"
-          name="category"
-        >
-          <option value="Femme">Femme</option>
-          <option value="Homme">Homme</option>
-          <option value="Accessoires">Accessoires</option>
-          <option value="Premium">Premium</option>
-        </select>
-      </div>
+        <div class="space-y-2">
+          <label class="label-caps text-[8px] text-gray-400">Prix (FCFA)</label>
+          <input type="number" placeholder="0" class="input-premium w-full text-xs py-3" [(ngModel)]="newProduct.price"
+            name="price" />
+        </div>
 
-      <div class="flex items-end">
-        <button
-          (click)="onAddProduct()"
-          class="w-full bg-black text-white py-4 label-caps text-[10px] hover:bg-black/90 transition-all shadow-lg"
-        >
-          Enregistrer
-        </button>
+        <div class="space-y-2">
+          <label class="label-caps text-[8px] text-gray-400">Collection</label>
+          <select class="input-premium w-full text-xs uppercase tracking-widest py-3 bg-transparent"
+            [(ngModel)]="newProduct.category" name="category">
+            <option value="Femme">Femme</option>
+            <option value="Homme">Homme</option>
+            <option value="Accessoires">Accessoires</option>
+            <option value="Premium">Premium</option>
+          </select>
+        </div>
+
+        <div class="space-y-2">
+          <label class="label-caps text-[8px] text-gray-400">Stock Initial</label>
+          <input type="number" placeholder="0" class="input-premium w-full text-xs py-3" [(ngModel)]="newProduct.stock"
+            name="stock" />
+        </div>
+
+        <div class="md:col-span-2 pt-4">
+          <button (click)="onAddProduct()"
+            class="w-full bg-black text-white py-5 label-caps text-[11px] hover:bg-black/90 transition-all shadow-lg">
+            Enregistrer dans l'inventaire
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -63,18 +95,18 @@
         </tr>
       </thead>
       <tbody class="divide-y divide-maison-light-gray">
-        <tr
-          *ngFor="let p of products"
-          class="group hover:bg-maison-greige/30 transition-colors"
-        >
+        <tr *ngFor="let p of products" class="group hover:bg-maison-greige/30 transition-colors">
           <td class="px-10 py-6 flex items-center gap-6">
             <div class="w-12 h-16 bg-maison-greige overflow-hidden border border-maison-light-gray">
-               <img [src]="p.image" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" alt="" />
+              <img [src]="p.image"
+                class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
+                alt="" />
             </div>
             <span class="label-caps text-[11px] text-black tracking-normal">{{ p.name }}</span>
           </td>
           <td class="px-10 py-6">
-            <span class="label-caps text-[9px] text-gray-400 border border-maison-light-gray px-3 py-1">{{ p.category }}</span>
+            <span class="label-caps text-[9px] text-gray-400 border border-maison-light-gray px-3 py-1">{{ p.category
+              }}</span>
           </td>
           <td class="px-10 py-6 font-sans text-sm tracking-tighter">
             {{ formatPriceFn(p.price) }}
@@ -82,31 +114,30 @@
           <td class="px-10 py-6">
             <div class="space-y-3 min-w-[150px]">
               <div class="flex justify-between items-baseline">
-                <span class="label-caps text-[8px]" [ngClass]="p.stock < 10 ? 'text-red-500' : 'text-gray-400'">{{ p.stock }} PIÈCES</span>
-                <span class="text-[9px] font-sans text-gray-300">{{ getStockPercentage(p.stock) | number:'1.0-0' }}%</span>
+                <span class="label-caps text-[8px]" [ngClass]="p.stock < 10 ? 'text-red-500' : 'text-gray-400'">{{
+                  p.stock }} PIÈCES</span>
+                <span class="text-[9px] font-sans text-gray-300">{{ getStockPercentage(p.stock) | number:'1.0-0'
+                  }}%</span>
               </div>
               <div class="w-full bg-maison-greige h-1">
-                <div
-                  class="h-full transition-all duration-1000"
-                  [ngClass]="p.stock < 10 ? 'bg-red-500' : 'bg-black'"
-                  [style.width.%]="getStockPercentage(p.stock)"
-                ></div>
+                <div class="h-full transition-all duration-1000" [ngClass]="p.stock < 10 ? 'bg-red-500' : 'bg-black'"
+                  [style.width.%]="getStockPercentage(p.stock)"></div>
               </div>
             </div>
           </td>
           <td class="px-10 py-6 text-right">
             <div class="flex items-center justify-end gap-2">
-              <button
-                (click)="onEditProduct(p)"
-                class="p-2 text-gray-300 hover:text-black transition-colors"
-              >
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="1.2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+              <button (click)="onEditProduct(p)" class="p-2 text-gray-300 hover:text-black transition-colors">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-width="1.2"
+                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
               </button>
-              <button
-                (click)="onDeleteProduct(p)"
-                class="p-2 text-gray-300 hover:text-red-500 transition-colors"
-              >
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="1.2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+              <button (click)="onDeleteProduct(p)" class="p-2 text-gray-300 hover:text-red-500 transition-colors">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-width="1.2"
+                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
               </button>
             </div>
           </td>
@@ -115,5 +146,3 @@
     </table>
   </div>
 </div>
-
-

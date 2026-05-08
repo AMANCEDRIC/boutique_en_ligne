@@ -23,6 +23,7 @@ export class CheckoutComponent implements OnInit {
   customerEmail = '';
   customerPhone = '';
   customerAddress = '';
+  paymentMethod = 'Paiement à la livraison';
 
   isSubmitting = false;
 
@@ -84,6 +85,7 @@ export class CheckoutComponent implements OnInit {
       items: [...this.cartItems],
       total: this.totalCart,
       status: 'En attente',
+      paymentMethod: this.paymentMethod,
     };
 
 

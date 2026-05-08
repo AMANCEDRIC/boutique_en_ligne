@@ -1,7 +1,7 @@
 <div class="min-h-screen bg-white selection:bg-black selection:text-white">
   <app-navbar *ngIf="!isAdminRoute"></app-navbar>
 
-  <main>
+  <main [class.pt-16]="!isAdminRoute">
     <router-outlet></router-outlet>
   </main>
 

@@ -12,6 +12,7 @@ export interface Order {
   items: CartItem[];
   total: number;
   status: OrderStatus;
+  paymentMethod?: string;
 }
 
 

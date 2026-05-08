@@ -25,7 +25,20 @@ export class AdminProductsComponent {
     price: 0,
     category: 'Femme' as Category,
     description: '',
+    stock: 0,
+    image: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&q=80&w=1000' // Default placeholder
   };
+
+  onFileSelected(event: any): void {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        this.newProduct.image = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+  }
 
   onAddProduct(): void {
     this.addProduct.emit(this.newProduct);
@@ -34,6 +47,8 @@ export class AdminProductsComponent {
       price: 0,
       category: 'Femme' as Category,
       description: '',
+      stock: 0,
+      image: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&q=80&w=1000'
     };
   }
 
@@ -56,6 +71,15 @@ export class AdminProductsComponent {
     if (percentage <= 20) return 'bg-red-500';
     if (percentage <= 50) return 'bg-yellow-500';
     return 'bg-green-500';
+  }
+
+  // Helper pour l'inventaire
+  getTotalStockPieces(): number {
+    return this.products.reduce((acc, p) => acc + (p.stock || 0), 0);
+  }
+
+  getLowStockCount(): number {
+    return this.products.filter(p => (p.stock || 0) < 10).length;
   }
 }
 

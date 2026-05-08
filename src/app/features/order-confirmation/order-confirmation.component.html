@@ -51,7 +51,9 @@
         </div>
         <div>
           <span class="label-caps text-[9px] text-gray-400">Mode de paiement</span>
-          <p class="text-xs uppercase tracking-widest mt-1 font-medium italic">Paiement à la livraison</p>
+          <p class="text-xs uppercase tracking-widest mt-1 font-medium italic">
+            {{ order.paymentMethod || 'Paiement à la livraison' }}
+          </p>
         </div>
       </div>
     </div>

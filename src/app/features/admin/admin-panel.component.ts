@@ -36,7 +36,7 @@ export class AdminPanelComponent implements OnInit {
     private productsService: ProductsService,
     private ordersService: OrdersService,
     private modalService: ModalService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     // S'abonner aux produits
@@ -71,6 +71,8 @@ export class AdminPanelComponent implements OnInit {
       price: product.price,
       category: product.category,
       description: product.description,
+      image: product.image,
+      stock: product.stock
     });
   }
 
@@ -79,11 +81,11 @@ export class AdminPanelComponent implements OnInit {
       `⚠️ ATTENTION : Êtes-vous sûr de vouloir supprimer définitivement l'article "${name}" ? Cette action est irréversible.`,
       'Confirmer la suppression'
     );
-    
+
     if (!confirmed) {
       return;
     }
-    
+
     this.productsService.deleteProduct(id);
     this.modalService.alert('Produit supprimé avec succès.', 'success');
   }
@@ -95,6 +97,11 @@ export class AdminPanelComponent implements OnInit {
       'info'
     );
     // TODO: Implémenter un modal ou une page d'édition de produit
+  }
+
+  onUpdateOrderStatus(event: { id: string; status: any }): void {
+    this.ordersService.updateOrderStatus(event.id, event.status);
+    this.modalService.alert(`Commande ${event.id} mise à jour : ${event.status}`, 'success');
   }
 }
 

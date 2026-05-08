@@ -48,16 +48,16 @@ export class ProductsService {
     return this.getAll().find((p) => p.id === id) || null;
   }
 
-  addProduct(partial: { name: string; price: number; category: Category; description?: string }): void {
+  addProduct(partial: { name: string; price: number; category: Category; description?: string; image?: string; stock?: number }): void {
     const newProduct: Product = {
       id: crypto.randomUUID(),
       name: partial.name,
       price: partial.price,
       category: partial.category,
       description: partial.description || '',
-      image: 'https://picsum.photos/400/600',
+      image: partial.image || 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&q=80&w=1000',
       sizes: ['S', 'M', 'L'],
-      stock: 10,
+      stock: partial.stock !== undefined ? partial.stock : 10,
     };
 
     const updated = [...this.productsSubject.value, newProduct];

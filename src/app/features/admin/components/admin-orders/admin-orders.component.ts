@@ -1,7 +1,7 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { Order } from '../../../../models';
+import { Order, OrderStatus } from '../../../../models';
 
 @Component({
   selector: 'app-admin-orders',
@@ -13,5 +13,10 @@ import { Order } from '../../../../models';
 export class AdminOrdersComponent {
   @Input() orders: Order[] = [];
   @Input() formatPriceFn!: (price: number) => string;
+  @Output() updateStatus = new EventEmitter<{ id: string; status: OrderStatus }>();
+
+  onUpdateStatus(id: string, status: OrderStatus): void {
+    this.updateStatus.emit({ id, status });
+  }
 }
 

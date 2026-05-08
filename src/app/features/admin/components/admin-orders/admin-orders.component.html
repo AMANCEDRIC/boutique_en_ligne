@@ -33,12 +33,30 @@
           </span>
         </td>
         <td class="px-10 py-6 text-right">
-          <a
-            [routerLink]="['/admin/order', o.id]"
-            class="label-caps text-[9px] text-gray-400 hover:text-black transition-colors border-b border-transparent hover:border-black"
-          >
-            Détails
-          </a>
+          <div class="flex items-center justify-end gap-4">
+            <!-- Quick Actions -->
+            <button 
+              *ngIf="o.status !== 'Livré' && o.status !== 'Annulé'"
+              (click)="onUpdateStatus(o.id, 'Livré')"
+              class="label-caps text-[8px] px-3 py-1 bg-green-600 text-white hover:bg-green-700 transition-colors"
+            >
+              Livrer
+            </button>
+            <button 
+              *ngIf="o.status === 'En attente'"
+              (click)="onUpdateStatus(o.id, 'Expédié')"
+              class="label-caps text-[8px] px-3 py-1 bg-blue-500 text-white hover:bg-blue-600 transition-colors"
+            >
+              Expédier
+            </button>
+            
+            <a
+              [routerLink]="['/admin/order', o.id]"
+              class="label-caps text-[9px] text-gray-400 hover:text-black transition-colors border-b border-transparent hover:border-black"
+            >
+              Détails
+            </a>
+          </div>
         </td>
       </tr>
     </tbody>

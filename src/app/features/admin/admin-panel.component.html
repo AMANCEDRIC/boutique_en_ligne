@@ -41,6 +41,7 @@
         *ngIf="activeTab === 'orders'"
         [orders]="orders"
         [formatPriceFn]="formatPrice.bind(this)"
+        (updateStatus)="onUpdateOrderStatus($event)"
       ></app-admin-orders>
     </div>
   </div>

@@ -70,6 +70,41 @@
             />
           </div>
         </div>
+        
+        <!-- Payment Method Section -->
+        <div class="space-y-8 pt-4">
+          <h2 class="h2-editorial text-2xl uppercase border-b border-maison-light-gray pb-4">Paiement</h2>
+          
+          <div class="space-y-4">
+            <!-- COD -->
+            <label class="flex items-center justify-between p-6 border border-black cursor-pointer bg-maison-greige transition-all group">
+              <div class="flex items-center gap-4">
+                <input type="radio" name="payment" value="Paiement à la livraison" [(ngModel)]="paymentMethod" class="radio radio-xs checked:bg-black" checked />
+                <div class="space-y-1">
+                  <span class="label-caps text-[11px] block">Paiement à la livraison</span>
+                  <span class="text-[9px] text-gray-500 uppercase tracking-widest">Payez en espèces lors de la réception</span>
+                </div>
+              </div>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 group-hover:text-black transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
+            </label>
+
+            <!-- Mobile Money (Common in West Africa) -->
+            <label class="flex items-center justify-between p-6 border border-maison-light-gray hover:border-black cursor-pointer transition-all group">
+              <div class="flex items-center gap-4">
+                <input type="radio" name="payment" value="Mobile Money" [(ngModel)]="paymentMethod" class="radio radio-xs checked:bg-black" />
+                <div class="space-y-1">
+                  <span class="label-caps text-[11px] block">Mobile Money</span>
+                  <span class="text-[9px] text-gray-400 uppercase tracking-widest">Wave / Orange / MTN</span>
+                </div>
+              </div>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-300 group-hover:text-black transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+              </svg>
+            </label>
+          </div>
+        </div>
 
         <div class="pt-12">
           <button
