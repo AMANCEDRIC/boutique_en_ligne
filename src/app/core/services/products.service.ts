@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { Product, Category } from '../../models/product.model';
+import { Product, SubCategory } from '../../models/product.model';
 import { Review } from '../../models/review.model';
 import { MOCK_PRODUCTS } from '../../constants/mock-products';
 import { StorageService } from './storage.service';
@@ -48,7 +48,7 @@ export class ProductsService {
     return this.getAll().find((p) => p.id === id) || null;
   }
 
-  addProduct(partial: { name: string; price: number; category: Category; description?: string; image?: string; stock?: number }): void {
+  addProduct(partial: { name: string; price: number; category: SubCategory; description?: string; image?: string; stock?: number }): void {
     const newProduct: Product = {
       id: crypto.randomUUID(),
       name: partial.name,

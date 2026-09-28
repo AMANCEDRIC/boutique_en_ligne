@@ -1,11 +1,13 @@
 <div class="min-h-screen bg-white selection:bg-black selection:text-white">
   <app-navbar *ngIf="!isAdminRoute"></app-navbar>
 
-  <main [class.pt-16]="!isAdminRoute">
+  <main [class.pt-16]="!isAdminRoute" [class.pb-16]="!isAdminRoute" [class.lg:pb-0]="!isAdminRoute">
     <router-outlet></router-outlet>
   </main>
 
   <app-footer *ngIf="!isAdminRoute"></app-footer>
   
   <app-modal></app-modal>
+  
+  <app-whatsapp-button *ngIf="!isAdminRoute"></app-whatsapp-button>
 </div>

@@ -7,60 +7,57 @@ export const MOCK_PRODUCTS: Product[] = [
     price: 22500,
     description: 'Une magnifique robe légère parfaite pour les journées ensoleillées. Tissu fluide et imprimé floral délicat.',
     image: 'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?auto=format&fit=crop&q=80&w=800',
-    category: 'Femme',
+    mainCategory: 'Vêtements',
+    category: 'Robes',
     sizes: ['XS', 'S', 'M', 'L'],
     stock: 15,
     isNew: true,
-    isSale: true,
+    isSale: false,
     points: 35,
     reviews: [
-      { id: 'r1', user: 'Emma L.', rating: 5, comment: 'Absolument magnifique ! La coupe est parfaite.', date: '2023-08-12' },
-      { id: 'r2', user: 'Julie D.', rating: 4, comment: 'Très jolie robe, un peu transparente toutefois.', date: '2023-08-15' }
+      { id: 'r1', user: 'Emma L.', rating: 5, comment: 'Absolument magnifique ! La coupe est parfaite.', date: '2023-08-12' }
     ]
   },
   {
     id: '2',
-    name: 'Blazer Oversize Noir',
+    name: 'Ensemble Tailleur Noir',
     price: 39500,
     description: 'Le basique indispensable. Coupe moderne et structurée pour un look chic ou décontracté.',
     image: 'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?auto=format&fit=crop&q=80&w=800',
-    category: 'Femme',
+    mainCategory: 'Vêtements',
+    category: 'Ensembles',
     sizes: ['S', 'M', 'L', 'XL'],
     stock: 4,
     points: 60,
-    reviews: [
-      { id: 'r3', user: 'Léa M.', rating: 5, comment: 'Qualité incroyable pour le prix. Je recommande !', date: '2023-09-01' }
-    ]
+    reviews: []
   },
   {
     id: '3',
-    name: 'Chemise en Lin Blanche',
+    name: 'Chemisier en Lin Blanc',
     price: 29000,
-    description: 'Fraîcheur et élégance naturelle avec cette chemise 100% lin.',
+    description: 'Fraîcheur et élégance naturelle avec ce chemisier 100% lin.',
     image: 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?auto=format&fit=crop&q=80&w=800',
-    category: 'Homme',
+    mainCategory: 'Vêtements',
+    category: 'Hauts',
     sizes: ['M', 'L', 'XL', 'XXL'],
     stock: 20,
     isNew: true,
     points: 45,
-    reviews: [
-      { id: 'r4', user: 'Marc P.', rating: 4, comment: 'Très agréable à porter l\'été.', date: '2023-07-20' }
-    ]
+    reviews: []
   },
   {
     id: '4',
-    name: 'Jean Droit Vintage',
+    name: 'Pantalon Droit Vintage',
     price: 32500,
-    description: 'Coupe classique inspirée des années 90. Denim de haute qualité.',
+    description: 'Coupe classique. Denim de haute qualité.',
     image: 'https://images.unsplash.com/photo-1542272604-787c3835535d?auto=format&fit=crop&q=80&w=800',
-    category: 'Femme',
+    mainCategory: 'Vêtements',
+    category: 'Bas',
     sizes: ['XS', 'S', 'M', 'L', 'XL'],
     stock: 2,
     isSale: true,
     points: 50,
-    reviews: [
-      { id: 'r5', user: 'Sarah K.', rating: 5, comment: 'La toile est épaisse et solide, top !', date: '2023-06-10' }
-    ]
+    reviews: []
   },
   {
     id: '5',
@@ -68,26 +65,40 @@ export const MOCK_PRODUCTS: Product[] = [
     price: 58000,
     description: 'Design épuré et finitions soignées pour ce sac intemporel.',
     image: 'https://images.unsplash.com/photo-1584917033904-493bb3c3af15?auto=format&fit=crop&q=80&w=800',
-    category: 'Accessoires',
-    sizes: [],
+    mainCategory: 'Accessoires',
+    category: 'Sacs',
+    sizes: ['TU'],
     stock: 5,
     points: 90,
     reviews: []
   },
   {
     id: '6',
-    name: 'Pull en Cachemire Doux',
-    price: 78500,
-    description: 'Un luxe abordable pour rester au chaud avec style.',
-    image: 'https://images.unsplash.com/photo-1576566588028-4147f3842f27?auto=format&fit=crop&q=80&w=800',
-    category: 'Femme',
-    sizes: ['S', 'M', 'L'],
+    name: 'Sandales en Cuir Tressé',
+    price: 28500,
+    description: 'Parfaites pour compléter vos tenues estivales.',
+    image: 'https://images.unsplash.com/photo-1562183241-b937e95585b6?auto=format&fit=crop&q=80&w=800',
+    mainCategory: 'Accessoires',
+    category: 'Sandales',
+    sizes: ['37', '38', '39', '40'],
     stock: 10,
-    isSale: true,
+    isNew: true,
     points: 120,
-    reviews: [
-      { id: 'r6', user: 'Chloé B.', rating: 5, comment: 'Une douceur incroyable.', date: '2023-10-05' }
-    ]
+    reviews: []
+  },
+  {
+    id: '7',
+    name: 'Collier Pendentif Or',
+    price: 15000,
+    description: 'Un bijou fin pour sublimer votre décolleté.',
+    image: 'https://images.unsplash.com/photo-1599643478524-fb66f70a00ea?auto=format&fit=crop&q=80&w=800',
+    mainCategory: 'Accessoires',
+    category: 'Bijoux',
+    sizes: ['TU'],
+    stock: 25,
+    isSale: true,
+    points: 30,
+    reviews: []
   }
 ];
 

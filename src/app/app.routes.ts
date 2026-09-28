@@ -8,6 +8,11 @@ import { OrderConfirmationComponent } from './features/order-confirmation/order-
 import { WishlistComponent } from './features/wishlist/wishlist.component';
 import { AdminPanelComponent } from './features/admin/admin-panel.component';
 import { AdminOrderDetailComponent } from './features/admin/components/admin-order-detail/admin-order-detail.component';
+import { HowToOrderComponent } from './features/pages/how-to-order/how-to-order.component';
+import { DeliveryComponent } from './features/pages/delivery/delivery.component';
+import { PaymentComponent } from './features/pages/payment/payment.component';
+import { AboutComponent } from './features/pages/about/about.component';
+import { ContactComponent } from './features/pages/contact/contact.component';
 
 export const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -19,5 +24,10 @@ export const routes: Routes = [
   { path: 'wishlist', component: WishlistComponent },
   { path: 'admin', component: AdminPanelComponent },
   { path: 'admin/order/:id', component: AdminOrderDetailComponent },
+  { path: 'how-to-order', component: HowToOrderComponent },
+  { path: 'delivery', component: DeliveryComponent },
+  { path: 'payment', component: PaymentComponent },
+  { path: 'about', component: AboutComponent },
+  { path: 'contact', component: ContactComponent },
   { path: '**', redirectTo: '' },
 ];

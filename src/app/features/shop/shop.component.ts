@@ -4,7 +4,7 @@ import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { ProductsService } from '../../core/services/products.service';
 import { CartService } from '../../core/services/cart.service';
 import { WishlistService } from '../../core/services/wishlist.service';
-import { Product, Size, Category } from '../../models';
+import { Product, Size, MainCategory, SubCategory } from '../../models';
 import { ProductCardComponent } from '../../shared/components/product-card/product-card.component';
 
 @Component({
@@ -19,10 +19,14 @@ export class ShopComponent implements OnInit {
   filteredProducts: Product[] = [];
   
   // Filtres
-  activeFilter: 'all' | 'new' | 'sale' = 'all';
-  selectedCategory: Category | 'all' = 'all';
+  activeFilter: string = 'all'; // Peut être 'all', 'vetements', 'Accessoires', 'new', 'sale'
+  selectedCategory: SubCategory | 'all' = 'all';
   selectedSize: Size | 'all' = 'all';
   sortBy: 'newest' | 'price-asc' | 'price-desc' = 'newest';
+
+  // Liste des sous-catégories pour les filtres (exemple basique)
+  availableCategories: SubCategory[] = ['Robes', 'Ensembles', 'Hauts', 'Bas', 'Sacs', 'Sandales', 'Bijoux', 'Premium'];
+  availableSizes: Size[] = ['TU', 'XS', 'S', 'M', 'L', 'XL', 'XXL', '37', '38', '39', '40'];
 
   constructor(
     private productsService: ProductsService,
@@ -33,20 +37,30 @@ export class ShopComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // Charger tous les produits
     this.productsService.products$.subscribe((products) => {
       this.allProducts = products;
       this.applyFilters();
     });
 
-    // Lire les query params pour le filtre navbar
     this.route.queryParams.subscribe(params => {
       const filter = params['filter'];
-      if (filter === 'new' || filter === 'sale') {
+      const category = params['category']; // Pour la recherche de sous-catégorie directe ou Accessoires
+
+      if (filter) {
         this.activeFilter = filter;
+      } else if (category === 'Accessoires') {
+        this.activeFilter = 'Accessoires';
       } else {
         this.activeFilter = 'all';
       }
+      
+      // Si on a passé une catégorie spécifique (autre que Accessoires)
+      if (category && category !== 'Accessoires' && this.availableCategories.includes(category as SubCategory)) {
+        this.selectedCategory = category as SubCategory;
+      } else {
+        this.selectedCategory = 'all';
+      }
+
       this.applyFilters();
     });
   }
@@ -54,14 +68,18 @@ export class ShopComponent implements OnInit {
   applyFilters(): void {
     let filtered = [...this.allProducts];
 
-    // Filtre principal (new, sale, all)
+    // Filtre navbar
     if (this.activeFilter === 'new') {
       filtered = filtered.filter(p => p.isNew === true);
     } else if (this.activeFilter === 'sale') {
       filtered = filtered.filter(p => p.isSale === true);
+    } else if (this.activeFilter === 'vetements') {
+      filtered = filtered.filter(p => p.mainCategory === 'Vêtements');
+    } else if (this.activeFilter === 'Accessoires') {
+      filtered = filtered.filter(p => p.mainCategory === 'Accessoires');
     }
 
-    // Filtre par catégorie
+    // Filtre par sous-catégorie
     if (this.selectedCategory !== 'all') {
       filtered = filtered.filter(p => p.category === this.selectedCategory);
     }
@@ -95,18 +113,18 @@ export class ShopComponent implements OnInit {
     }
   }
 
-  onFilterChange(filter: 'all' | 'new' | 'sale'): void {
+  onFilterChange(filter: string): void {
     this.activeFilter = filter;
+    this.selectedCategory = 'all';
     this.router.navigate(['/shop'], { 
       queryParams: { filter: filter === 'all' ? null : filter } 
     });
   }
 
   onCategoryChange(category: any): void {
-    this.selectedCategory = category as Category | 'all';
+    this.selectedCategory = category as SubCategory | 'all';
     this.applyFilters();
   }
-
 
   onSizeChange(size: Size | 'all'): void {
     this.selectedSize = size;
@@ -128,7 +146,7 @@ export class ShopComponent implements OnInit {
   }
 
   onAddToCart(product: Product): void {
-    const defaultSize: Size = (product.sizes && product.sizes.length > 0) ? product.sizes[0] : 'M';
+    const defaultSize: Size = (product.sizes && product.sizes.length > 0) ? product.sizes[0] : 'TU';
     this.cartService.addToCart(product, defaultSize);
   }
 

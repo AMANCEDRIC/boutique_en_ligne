@@ -12,21 +12,47 @@
       <ng-container *ngIf="showBadges">
         <span
           *ngIf="product.isNew"
-          class="absolute top-0 left-0 bg-black text-white label-caps text-[9px] px-3 py-1.5"
+          class="absolute top-0 left-0 bg-black text-white label-caps text-[8px] sm:text-[9px] px-2.5 py-1"
         >
           New
         </span>
         <span
           *ngIf="product.isSale"
-          class="absolute top-0 left-0 bg-maison-gold text-white label-caps text-[9px] px-3 py-1.5"
-          [class.mt-8]="product.isNew"
+          class="absolute top-0 left-0 bg-maison-gold text-white label-caps text-[8px] sm:text-[9px] px-2.5 py-1"
+          [class.mt-6]="product.isNew"
+          [class.sm:mt-8]="product.isNew"
         >
           Sale
         </span>
       </ng-container>
 
-      <!-- Hover Quick Actions -->
-      <div class="absolute bottom-0 left-0 w-full p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-500 bg-white/10 backdrop-blur-sm flex gap-2">
+      <!-- Mobile Quick Actions Floating Buttons (Touch optimized) -->
+      <div class="absolute top-2 right-2 flex flex-col gap-1.5 sm:hidden z-10">
+        <button
+          (click)="onToggleWishlist($event)"
+          aria-label="Ajouter aux favoris"
+          class="bg-white/90 backdrop-blur-md text-black p-2 rounded-full shadow-sm active:scale-95 transition-transform"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+              d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+          </svg>
+        </button>
+        <button
+          (click)="onAddToCart($event)"
+          aria-label="Ajouter au panier"
+          class="p-2 rounded-full shadow-sm active:scale-95 transition-transform"
+          [ngClass]="addedToCart ? 'bg-maison-gold text-white' : 'bg-black text-white'"
+        >
+          <svg *ngIf="!addedToCart" xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+          </svg>
+          <span *ngIf="addedToCart" class="text-[9px] font-bold">✓</span>
+        </button>
+      </div>
+
+      <!-- Desktop Hover Quick Actions -->
+      <div class="hidden sm:flex absolute bottom-0 left-0 w-full p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-500 bg-white/10 backdrop-blur-sm gap-2">
         <button
           (click)="onAddToCart($event)"
           class="flex-grow py-3 label-caps text-[9px] transition-all duration-300"
@@ -47,21 +73,18 @@
     </div>
 
     <!-- Info Section -->
-    <div class="mt-6 space-y-2">
-      <div class="flex justify-between items-start gap-4">
-        <h4 class="text-[13px] font-sans uppercase tracking-[0.1em] leading-tight flex-grow">
+    <div class="mt-3 sm:mt-6 space-y-1 sm:space-y-2">
+      <div class="flex justify-between items-start gap-2 sm:gap-4">
+        <h4 class="text-[11px] sm:text-[13px] font-sans uppercase tracking-[0.05em] sm:tracking-[0.1em] leading-tight flex-grow line-clamp-1">
           {{ product.name }}
         </h4>
-        <p class="text-[13px] font-semibold">
+        <p class="text-[11px] sm:text-[13px] font-semibold whitespace-nowrap">
           {{ formatPrice(product.price) }}
         </p>
       </div>
-      <p class="label-caps text-[10px] text-gray-400">
+      <p class="label-caps text-[9px] sm:text-[10px] text-gray-400">
         {{ product.category }}
       </p>
     </div>
   </a>
 </div>
-
-
-

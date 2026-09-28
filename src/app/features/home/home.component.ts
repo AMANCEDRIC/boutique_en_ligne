@@ -39,8 +39,14 @@ export class HomeComponent implements OnInit {
       .slice(0, 4);
   }
 
-  goShop(): void {
-    this.router.navigateByUrl('/shop');
+  goShop(filter?: string): void {
+    if (filter === 'accessoires') {
+      this.router.navigate(['/shop'], { queryParams: { category: 'Accessoires' } });
+    } else if (filter === 'vetements') {
+      this.router.navigate(['/shop'], { queryParams: { filter: 'vetements' } });
+    } else {
+      this.router.navigateByUrl('/shop');
+    }
   }
 
   onAddToCart(product: Product): void {

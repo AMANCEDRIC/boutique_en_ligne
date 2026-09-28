@@ -1,3 +1,4 @@
+<!-- Header Nav -->
 <nav class="fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-out"
   [ngClass]="{
     'bg-white/95 backdrop-blur-md border-b border-maison-light-gray shadow-[0_2px_20px_rgba(0,0,0,0.06)]': !isTransparent,
@@ -5,102 +6,153 @@
     '-translate-y-full': isHidden,
     'translate-y-0': !isHidden
   }">
-  <div class="max-w-[1800px] mx-auto px-6 flex items-center justify-between transition-all duration-500"
-    [ngClass]="isTransparent ? 'py-5' : 'py-3'">
-    <!-- Logo -->
-    <div class="cursor-pointer flex-shrink-0" (click)="goHome()">
-      <h1 class="font-serif tracking-[-0.05em] hover:opacity-70 transition-all uppercase"
-          [ngClass]="isTransparent ? 'text-2xl md:text-3xl text-white' : 'text-xl md:text-2xl text-black'">
-        Maison Shein
-      </h1>
+  <div class="max-w-[1800px] mx-auto px-4 md:px-6 flex items-center justify-between transition-all duration-500"
+    [ngClass]="isTransparent ? 'py-4 md:py-5' : 'py-2.5 md:py-3'">
+    
+    <!-- Gauche: Hamburger (Mobile) + Logo -->
+    <div class="flex items-center space-x-3 md:space-x-4">
+      <!-- Bouton Menu Mobile Hamburger -->
+      <button 
+        (click)="toggleMobileMenu()"
+        aria-label="Ouvrir le menu mobile"
+        class="lg:hidden p-2 -ml-1 hover:opacity-70 transition-opacity rounded-full"
+        [ngClass]="isTransparent ? 'text-white' : 'text-black'">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
+
+      <!-- Logo -->
+      <div class="cursor-pointer flex-shrink-0" (click)="goHome()">
+        <h1 class="font-serif tracking-[-0.05em] hover:opacity-70 transition-all uppercase"
+            [ngClass]="isTransparent ? 'text-xl md:text-3xl text-white' : 'text-lg md:text-2xl text-black'">
+          Maison Shein
+        </h1>
+      </div>
     </div>
 
-    <!-- Navigation centrale -->
+    <!-- Navigation centrale (Desktop) -->
     <div class="hidden lg:flex items-center space-x-10">
       <button
-        (click)="goShop('all')"
+        (click)="goShop('vetements')"
         class="label-caps transition-colors py-2 relative group"
         [ngClass]="isTransparent
-          ? (navFilter === 'all' ? 'text-white' : 'text-white/60 hover:text-white')
-          : (navFilter === 'all' ? 'text-black' : 'text-gray-400 hover:text-black')"
+          ? (navFilter === 'vetements' ? 'text-white' : 'text-white/60 hover:text-white')
+          : (navFilter === 'vetements' ? 'text-black' : 'text-gray-400 hover:text-black')"
       >
-        Collection
+        Vêtements
         <span class="absolute bottom-0 left-0 w-full h-0.5 transform transition-transform duration-300"
               [ngClass]="{
                 'bg-white': isTransparent,
                 'bg-black': !isTransparent,
-                'scale-x-100': navFilter === 'all',
-                'scale-x-0 group-hover:scale-x-100': navFilter !== 'all'
+                'scale-x-100': navFilter === 'vetements',
+                'scale-x-0 group-hover:scale-x-100': navFilter !== 'vetements'
               }"></span>
       </button>
+
       <button
-        (click)="goShop('new')"
+        (click)="goCategory('Accessoires')"
         class="label-caps transition-colors py-2 relative group"
         [ngClass]="isTransparent
-          ? (navFilter === 'new' ? 'text-white' : 'text-white/60 hover:text-white')
-          : (navFilter === 'new' ? 'text-black' : 'text-gray-400 hover:text-black')"
+          ? (navFilter === 'Accessoires' ? 'text-white' : 'text-white/60 hover:text-white')
+          : (navFilter === 'Accessoires' ? 'text-black' : 'text-gray-400 hover:text-black')"
       >
-        Nouveautés
+        Accessoires
         <span class="absolute bottom-0 left-0 w-full h-0.5 transform transition-transform duration-300"
               [ngClass]="{
                 'bg-white': isTransparent,
                 'bg-black': !isTransparent,
-                'scale-x-100': navFilter === 'new',
-                'scale-x-0 group-hover:scale-x-100': navFilter !== 'new'
+                'scale-x-100': navFilter === 'Accessoires',
+                'scale-x-0 group-hover:scale-x-100': navFilter !== 'Accessoires'
               }"></span>
       </button>
-      <button
-        (click)="goShop('sale')"
-        class="label-caps transition-colors py-2 relative group text-red-400 hover:text-red-500"
+
+      <div class="relative group">
+        <button
+          class="label-caps transition-colors py-2 flex items-center space-x-1"
+          [ngClass]="isTransparent ? 'text-white/60 hover:text-white' : 'text-gray-400 hover:text-black'"
+        >
+          <span>Informations</span>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+        <!-- Dropdown Desktop -->
+        <div class="absolute top-full left-0 pt-4 hidden group-hover:block w-48 z-50">
+          <div class="bg-white shadow-xl border border-gray-100 py-2 flex flex-col">
+            <a routerLink="/how-to-order" class="px-4 py-2 label-caps text-[10px] text-gray-500 hover:text-black hover:bg-gray-50 transition-colors text-left">Comment commander</a>
+            <a routerLink="/delivery" class="px-4 py-2 label-caps text-[10px] text-gray-500 hover:text-black hover:bg-gray-50 transition-colors text-left">Livraison</a>
+            <a routerLink="/payment" class="px-4 py-2 label-caps text-[10px] text-gray-500 hover:text-black hover:bg-gray-50 transition-colors text-left">Paiement</a>
+          </div>
+        </div>
+      </div>
+
+      <a
+        routerLink="/about"
+        class="label-caps transition-colors py-2"
+        [ngClass]="isTransparent ? 'text-white/60 hover:text-white' : 'text-gray-400 hover:text-black'"
       >
-        Promotions
-        <span class="absolute bottom-0 left-0 w-full h-0.5 bg-red-500 transform transition-transform duration-300"
-              [ngClass]="navFilter === 'sale' ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'"></span>
-      </button>
+        À propos
+      </a>
+
+      <a
+        routerLink="/contact"
+        class="label-caps transition-colors py-2"
+        [ngClass]="isTransparent ? 'text-white/60 hover:text-white' : 'text-gray-400 hover:text-black'"
+      >
+        Contact
+      </a>
     </div>
 
     <!-- Actions droites -->
-    <div class="flex items-center space-x-6">
+    <div class="flex items-center space-x-3 md:space-x-6">
       <button
         (click)="goAdmin()"
-        class="hidden sm:block label-caps text-[10px] px-4 py-1.5 transition-all border"
+        class="hidden sm:block label-caps text-[10px] px-3.5 py-1.5 transition-all border"
         [ngClass]="isTransparent
-          ? 'text-white/70 hover:text-white border-white/30'
-          : 'text-gray-400 hover:text-black border-maison-light-gray'"
+          ? 'text-white/80 hover:text-white border-white/30'
+          : 'text-gray-500 hover:text-black border-maison-light-gray'"
       >
         Admin
       </button>
 
-      <div class="flex items-center space-x-4">
-        <button class="p-1 hover:scale-110 transition-transform hidden md:block"
-                [ngClass]="isTransparent ? 'text-white' : 'text-black'">
+      <div class="flex items-center space-x-2 md:space-x-4">
+        <!-- Recherche (visible partout) -->
+        <button (click)="toggleSearch()" 
+                class="p-2 hover:scale-110 transition-transform"
+                [ngClass]="isTransparent ? 'text-white' : 'text-black'"
+                aria-label="Recherche">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
         </button>
 
-        <button (click)="goWishlist()" class="relative p-1 hover:scale-110 transition-transform"
-                [ngClass]="isTransparent ? 'text-white' : 'text-black'">
+        <!-- Favoris -->
+        <button (click)="goWishlist()" class="relative p-2 hover:scale-110 transition-transform"
+                [ngClass]="isTransparent ? 'text-white' : 'text-black'"
+                aria-label="Favoris">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.2"
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6"
               d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
           </svg>
           <span *ngIf="wishlistCount > 0"
-                class="absolute -top-1 -right-1 bg-maison-gold text-white text-[8px] w-3.5 h-3.5 flex items-center justify-center font-bold">
+                class="absolute top-0 right-0 bg-maison-gold text-white text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-bold shadow-sm">
             {{ wishlistCount }}
           </span>
         </button>
 
+        <!-- Panier -->
         <button (click)="goCart()"
-                class="relative p-1 hover:scale-110 transition-transform"
+                class="relative p-2 hover:scale-110 transition-transform"
                 [ngClass]="isTransparent ? 'text-white' : 'text-black'"
-                [class.cart-bounce]="cartAnimating">
+                [class.cart-bounce]="cartAnimating"
+                aria-label="Panier">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.2"
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6"
               d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
           </svg>
           <span *ngIf="cartCount > 0"
-                class="absolute -top-1 -right-1 text-white text-[8px] w-3.5 h-3.5 flex items-center justify-center font-bold"
+                class="absolute top-0 right-0 text-white text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-bold shadow-sm"
                 [ngClass]="isTransparent ? 'bg-maison-gold' : 'bg-black'">
             {{ cartCount }}
           </span>
@@ -108,4 +160,162 @@
       </div>
     </div>
   </div>
+
+  <!-- Barre de recherche dépliante -->
+  <div *ngIf="isSearchOpen" 
+       class="bg-white border-b border-maison-light-gray shadow-md py-4 px-6 animate-in fade-in slide-in-from-bottom-1 text-black">
+    <form (ngSubmit)="onSearchSubmit($event)" class="max-w-3xl mx-auto flex items-center gap-3">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+      </svg>
+      <input 
+        type="text" 
+        [(ngModel)]="searchQuery" 
+        name="searchQuery"
+        placeholder="Rechercher une pièce, robe, manteau..." 
+        class="w-full bg-transparent outline-none text-sm font-light uppercase tracking-wider py-1 border-b border-gray-200 focus:border-black"
+        autoFocus
+      />
+      <button type="submit" class="bg-black text-white px-5 py-2 label-caps text-[9px] hover:bg-gray-800 transition-colors">
+        Chercher
+      </button>
+      <button type="button" (click)="toggleSearch()" class="p-2 text-gray-400 hover:text-black">
+        ✕
+      </button>
+    </form>
+  </div>
+</nav>
+
+<!-- ========================================================================= -->
+<!-- MENU MOBILE OFF-CANVAS / DRAWER (Style Minimaliste)                       -->
+<!-- ========================================================================= -->
+<div *ngIf="isMobileMenuOpen" class="fixed inset-0 z-[60] lg:hidden bg-white overflow-y-auto animate-in fade-in duration-200">
+  
+  <!-- Header Minimaliste -->
+  <div class="flex items-center justify-between py-5 px-6 border-b border-gray-100">
+    <div class="cursor-pointer" (click)="goHome()">
+      <!-- Utilisation d'une police script pour imiter le style du logo de l'image -->
+      <h2 class="text-3xl tracking-tight text-black" style="font-family: 'Brush Script MT', 'Dancing Script', cursive;">Maison Shein</h2>
+    </div>
+    <button (click)="closeMobileMenu()" class="p-2 -mr-2 text-gray-500 hover:text-black transition-colors" aria-label="Fermer le menu">
+      <!-- Croix très fine -->
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="0.8" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+  </div>
+
+  <!-- Liens du menu -->
+  <div class="flex flex-col">
+    <button (click)="goShop('vetements')" class="flex items-center justify-between py-5 px-6 border-b border-gray-50 hover:bg-gray-50 transition-colors text-left w-full">
+      <span class="font-sans text-[11px] font-medium uppercase tracking-[0.15em] text-black/80">Vêtements</span>
+      <span class="text-gray-400 font-light">+</span>
+    </button>
+    
+    <button (click)="goCategory('Accessoires')" class="flex items-center justify-between py-5 px-6 border-b border-gray-50 hover:bg-gray-50 transition-colors text-left w-full">
+      <span class="font-sans text-[11px] font-medium uppercase tracking-[0.15em] text-black/80">Accessoires</span>
+      <span class="text-gray-400 font-light">+</span>
+    </button>
+
+    <div class="py-5 px-6 border-b border-gray-50">
+      <span class="font-sans text-[10px] uppercase tracking-[0.15em] text-gray-400 mb-4 block">Informations Pratiques</span>
+      <div class="flex flex-col space-y-4">
+        <a (click)="closeMobileMenu()" routerLink="/how-to-order" class="font-sans text-[11px] font-medium uppercase tracking-[0.15em] text-black/80 hover:text-black">Comment commander ?</a>
+        <a (click)="closeMobileMenu()" routerLink="/delivery" class="font-sans text-[11px] font-medium uppercase tracking-[0.15em] text-black/80 hover:text-black">Livraison</a>
+        <a (click)="closeMobileMenu()" routerLink="/payment" class="font-sans text-[11px] font-medium uppercase tracking-[0.15em] text-black/80 hover:text-black">Paiement</a>
+      </div>
+    </div>
+
+    <button (click)="closeMobileMenu()" routerLink="/about" class="flex items-center justify-between py-5 px-6 border-b border-gray-50 hover:bg-gray-50 transition-colors text-left w-full">
+      <span class="font-sans text-[11px] font-medium uppercase tracking-[0.15em] text-black/80">À propos</span>
+    </button>
+
+    <button (click)="closeMobileMenu()" routerLink="/contact" class="flex items-center justify-between py-5 px-6 border-b border-gray-50 hover:bg-gray-50 transition-colors text-left w-full">
+      <span class="font-sans text-[11px] font-medium uppercase tracking-[0.15em] text-black/80">Contact</span>
+    </button>
+  </div>
+</div>
+
+<!-- ========================================================================= -->
+<!-- BARRE DE NAVIGATION FIXE EN BAS (Style App Mobile Native - Bottom Nav Bar) -->
+<!-- ========================================================================= -->
+<nav class="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-gray-200/80 shadow-[0_-4px_20px_rgba(0,0,0,0.08)] py-1.5 px-2 flex justify-around items-center lg:hidden">
+  
+  <!-- 1. Accueil -->
+  <button 
+    (click)="goHome()"
+    class="flex flex-col items-center justify-center py-1 px-3 transition-colors rounded-lg"
+    [ngClass]="isRouteActive('/') && !isMobileMenuOpen ? 'text-black' : 'text-gray-400 hover:text-black'">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" [attr.fill]="isRouteActive('/') && !isMobileMenuOpen ? 'currentColor' : 'none'" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+    </svg>
+    <span class="text-[9px] font-medium tracking-tight mt-0.5" [ngClass]="isRouteActive('/') && !isMobileMenuOpen ? 'font-bold text-black' : ''">Accueil</span>
+  </button>
+
+  <!-- 2. Boutique / Collection -->
+  <button 
+    (click)="goShop('all')"
+    class="flex flex-col items-center justify-center py-1 px-3 transition-colors rounded-lg"
+    [ngClass]="isRouteActive('/shop') && !isMobileMenuOpen ? 'text-black' : 'text-gray-400 hover:text-black'">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" [attr.fill]="isRouteActive('/shop') && !isMobileMenuOpen ? 'currentColor' : 'none'" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+    </svg>
+    <span class="text-[9px] font-medium tracking-tight mt-0.5" [ngClass]="isRouteActive('/shop') && !isMobileMenuOpen ? 'font-bold text-black' : ''">Boutique</span>
+  </button>
+
+  <!-- 3. Recherche -->
+  <button 
+    (click)="toggleSearch()"
+    class="flex flex-col items-center justify-center py-1 px-3 transition-colors rounded-lg"
+    [ngClass]="isSearchOpen ? 'text-black font-bold' : 'text-gray-400 hover:text-black'">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+    </svg>
+    <span class="text-[9px] font-medium tracking-tight mt-0.5">Rechercher</span>
+  </button>
+
+  <!-- 4. Favoris (avec badge) -->
+  <button 
+    (click)="goWishlist()"
+    class="flex flex-col items-center justify-center py-1 px-3 transition-colors rounded-lg relative"
+    [ngClass]="isRouteActive('/wishlist') && !isMobileMenuOpen ? 'text-black' : 'text-gray-400 hover:text-black'">
+    <div class="relative">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" [attr.fill]="isRouteActive('/wishlist') && !isMobileMenuOpen ? 'currentColor' : 'none'" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+      </svg>
+      <span *ngIf="wishlistCount > 0" class="absolute -top-1 -right-2 bg-maison-gold text-white text-[8px] w-3.5 h-3.5 rounded-full flex items-center justify-center font-bold">
+        {{ wishlistCount }}
+      </span>
+    </div>
+    <span class="text-[9px] font-medium tracking-tight mt-0.5" [ngClass]="isRouteActive('/wishlist') && !isMobileMenuOpen ? 'font-bold text-black' : ''">Favoris</span>
+  </button>
+
+  <!-- 5. Panier (avec badge) -->
+  <button 
+    (click)="goCart()"
+    class="flex flex-col items-center justify-center py-1 px-3 transition-colors rounded-lg relative"
+    [ngClass]="isRouteActive('/cart') && !isMobileMenuOpen ? 'text-black' : 'text-gray-400 hover:text-black'"
+    [class.cart-bounce]="cartAnimating">
+    <div class="relative">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" [attr.fill]="isRouteActive('/cart') && !isMobileMenuOpen ? 'currentColor' : 'none'" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+      </svg>
+      <span *ngIf="cartCount > 0" class="absolute -top-1 -right-2 bg-black text-white text-[8px] w-3.5 h-3.5 rounded-full flex items-center justify-center font-bold">
+        {{ cartCount }}
+      </span>
+    </div>
+    <span class="text-[9px] font-medium tracking-tight mt-0.5" [ngClass]="isRouteActive('/cart') && !isMobileMenuOpen ? 'font-bold text-black' : ''">Panier</span>
+  </button>
+
+  <!-- 6. Menu Hamburger Bottom Trigger -->
+  <button 
+    (click)="toggleMobileMenu()"
+    class="flex flex-col items-center justify-center py-1 px-3 transition-colors rounded-lg"
+    [ngClass]="isMobileMenuOpen ? 'text-black font-bold' : 'text-gray-400 hover:text-black'">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 6h16M4 12h16M4 18h16" />
+    </svg>
+    <span class="text-[9px] font-medium tracking-tight mt-0.5">Menu</span>
+  </button>
+
 </nav>

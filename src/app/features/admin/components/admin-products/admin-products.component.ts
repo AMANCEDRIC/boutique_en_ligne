@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Product, Category } from '../../../../models';
+import { Product, SubCategory } from '../../../../models';
 
 @Component({
   selector: 'app-admin-products',
@@ -23,7 +23,7 @@ export class AdminProductsComponent {
   newProduct: Partial<Product> = {
     name: '',
     price: 0,
-    category: 'Femme' as Category,
+    category: 'Robes' as SubCategory,
     description: '',
     stock: 0,
     image: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&q=80&w=1000' // Default placeholder
@@ -45,7 +45,7 @@ export class AdminProductsComponent {
     this.newProduct = {
       name: '',
       price: 0,
-      category: 'Femme' as Category,
+      category: 'Robes' as SubCategory,
       description: '',
       stock: 0,
       image: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&q=80&w=1000'

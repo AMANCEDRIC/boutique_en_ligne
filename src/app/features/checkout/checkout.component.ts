@@ -88,15 +88,33 @@ export class CheckoutComponent implements OnInit {
       paymentMethod: this.paymentMethod,
     };
 
-
-    // Sauvegarder la commande
+    // Sauvegarder la commande (pour le panel admin)
     this.ordersService.addOrder(newOrder);
+
+    // Formater le message WhatsApp
+    let message = `Bonjour Maison Shein, je souhaite valider ma commande (Réf: ${newOrder.id}) :\n\n`;
+    
+    this.cartItems.forEach(item => {
+      message += `- ${item.quantity}x ${item.name} (Taille: ${item.selectedSize}) - ${this.formatPrice(item.price * item.quantity)}\n`;
+    });
+    
+    message += `\n*TOTAL : ${this.formatPrice(this.totalCart)}*\n\n`;
+    message += `*Mes Coordonnées :*\n`;
+    message += `Nom : ${this.customerName}\n`;
+    message += `Téléphone : ${this.customerPhone}\n`;
+    message += `Adresse : ${this.customerAddress}\n`;
+    message += `Paiement souhaité : ${this.paymentMethod}\n`;
+
+    const encodedMessage = encodeURIComponent(message);
+    const whatsappUrl = `https://wa.me/33600000000?text=${encodedMessage}`;
 
     // Vider le panier
     this.cartService.clearCart();
 
-    // Rediriger vers la page de confirmation
-    this.router.navigate(['/order-confirmation', newOrder.id]);
+    this.isSubmitting = false;
+
+    // Rediriger vers WhatsApp
+    window.location.href = whatsappUrl;
   }
 
   goBack(): void {
