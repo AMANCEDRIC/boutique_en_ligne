@@ -3,10 +3,18 @@
     <!-- Image Container -->
     <div class="relative aspect-[3/4] overflow-hidden bg-maison-greige">
       <img
-        [src]="product.image"
+        [src]="imageUrl"
         [alt]="product.name"
+        loading="lazy"
         class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
       />
+
+      <span *ngIf="hasVideo(product)" class="absolute bottom-2 left-2 sm:bottom-auto sm:top-2 sm:left-auto sm:right-2 bg-black/60 text-white text-[8px] sm:text-[9px] font-bold uppercase px-2 py-1 pointer-events-none">
+        ▶ Vidéo
+      </span>
+      <span *ngIf="product.stock <= 0" class="absolute inset-x-0 bottom-0 bg-white/85 text-center text-[9px] font-bold uppercase tracking-widest py-1.5 pointer-events-none">
+        Épuisé
+      </span>
 
       <!-- Badges -->
       <ng-container *ngIf="showBadges">
@@ -14,7 +22,7 @@
           *ngIf="product.isNew"
           class="absolute top-0 left-0 bg-black text-white label-caps text-[8px] sm:text-[9px] px-2.5 py-1"
         >
-          New
+          Nouveau
         </span>
         <span
           *ngIf="product.isSale"
@@ -22,7 +30,7 @@
           [class.mt-6]="product.isNew"
           [class.sm:mt-8]="product.isNew"
         >
-          Sale
+          Promo
         </span>
       </ng-container>
 
@@ -39,6 +47,7 @@
           </svg>
         </button>
         <button
+          *ngIf="product.stock > 0"
           (click)="onAddToCart($event)"
           aria-label="Ajouter au panier"
           class="p-2 rounded-full shadow-sm active:scale-95 transition-transform"
@@ -52,13 +61,13 @@
       </div>
 
       <!-- Desktop Hover Quick Actions -->
-      <div class="hidden sm:flex absolute bottom-0 left-0 w-full p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-500 bg-white/10 backdrop-blur-sm gap-2">
+      <div *ngIf="product.stock > 0" class="hidden sm:flex absolute bottom-0 left-0 w-full p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-500 bg-white/10 backdrop-blur-sm gap-2">
         <button
           (click)="onAddToCart($event)"
           class="flex-grow py-3 label-caps text-[9px] transition-all duration-300"
           [ngClass]="addedToCart ? 'bg-maison-gold text-white' : 'bg-black text-white hover:bg-black/80'"
         >
-          {{ addedToCart ? 'Ajouté ✓' : 'Add to Cart' }}
+          {{ addedToCart ? 'Ajouté ✓' : 'Ajouter au panier' }}
         </button>
         <button
           (click)="onToggleWishlist($event)"

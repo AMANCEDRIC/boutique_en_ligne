@@ -1,66 +1,51 @@
-<div class="bg-white border border-maison-light-gray shadow-ambient overflow-hidden">
-  <table class="w-full text-left">
-    <thead>
-      <tr class="border-b border-maison-light-gray">
-        <th class="px-10 py-6 label-caps text-[10px] text-gray-400 tracking-[0.2em]">Référence</th>
-        <th class="px-10 py-6 label-caps text-[10px] text-gray-400 tracking-[0.2em]">Date</th>
-        <th class="px-10 py-6 label-caps text-[10px] text-gray-400 tracking-[0.2em]">Client</th>
-        <th class="px-10 py-6 label-caps text-[10px] text-gray-400 tracking-[0.2em]">Montant</th>
-        <th class="px-10 py-6 label-caps text-[10px] text-gray-400 text-center tracking-[0.2em]">Statut</th>
-        <th class="px-10 py-6 label-caps text-[10px] text-gray-400 text-right tracking-[0.2em]">Actions</th>
-      </tr>
-    </thead>
-    <tbody class="divide-y divide-maison-light-gray">
-      <tr
-        *ngFor="let o of orders"
-        class="group hover:bg-maison-greige/30 transition-colors"
-      >
-        <td class="px-10 py-6 font-mono text-xs text-gray-400">#{{ o.id }}</td>
-        <td class="px-10 py-6 label-caps text-[10px] tracking-normal">{{ o.date }}</td>
-        <td class="px-10 py-6 label-caps text-[11px] text-black tracking-normal">{{ o.customerName }}</td>
-        <td class="px-10 py-6 font-sans text-sm tracking-tighter">{{ formatPriceFn(o.total) }}</td>
-        <td class="px-10 py-6 text-center">
-          <span
-            class="px-4 py-1.5 label-caps text-[8px] border inline-block"
-            [ngClass]="{
-              'border-blue-200 text-blue-500 bg-blue-50/30': o.status === 'Expédié',
-              'border-maison-gold/50 text-maison-gold bg-maison-gold/5': o.status === 'En attente',
-              'border-green-200 text-green-600 bg-green-50/30': o.status === 'Livré',
-              'border-red-200 text-red-500 bg-red-50/30': o.status === 'Annulé'
-            }"
-          >
-            {{ o.status }}
-          </span>
-        </td>
-        <td class="px-10 py-6 text-right">
-          <div class="flex items-center justify-end gap-4">
-            <!-- Quick Actions -->
-            <button 
-              *ngIf="o.status !== 'Livré' && o.status !== 'Annulé'"
-              (click)="onUpdateStatus(o.id, 'Livré')"
-              class="label-caps text-[8px] px-3 py-1 bg-green-600 text-white hover:bg-green-700 transition-colors"
-            >
-              Livrer
-            </button>
-            <button 
-              *ngIf="o.status === 'En attente'"
-              (click)="onUpdateStatus(o.id, 'Expédié')"
-              class="label-caps text-[8px] px-3 py-1 bg-blue-500 text-white hover:bg-blue-600 transition-colors"
-            >
-              Expédier
-            </button>
-            
-            <a
-              [routerLink]="['/admin/order', o.id]"
-              class="label-caps text-[9px] text-gray-400 hover:text-black transition-colors border-b border-transparent hover:border-black"
-            >
-              Détails
-            </a>
-          </div>
-        </td>
-      </tr>
-    </tbody>
-  </table>
+<div class="space-y-5">
+  <div class="flex gap-2 overflow-x-auto no-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0">
+    <button *ngFor="let s of statuses" (click)="statusFilter = s"
+      class="px-4 py-2 border text-[10px] font-semibold uppercase tracking-wide whitespace-nowrap"
+      [ngClass]="statusFilter === s ? 'bg-black text-white border-black' : 'bg-white border-maison-light-gray text-gray-500'">
+      {{ s }} ({{ count(s) }})
+    </button>
+    <button (click)="statusFilter = 'all'"
+      class="px-4 py-2 border text-[10px] font-semibold uppercase tracking-wide whitespace-nowrap"
+      [ngClass]="statusFilter === 'all' ? 'bg-black text-white border-black' : 'bg-white border-maison-light-gray text-gray-500'">
+      Toutes ({{ orders.length }})
+    </button>
+  </div>
+
+  <div *ngIf="!filtered.length" class="bg-white border border-maison-light-gray p-10 text-center text-sm text-gray-400">
+    Aucune commande ici.
+  </div>
+
+  <div class="grid grid-cols-1 xl:grid-cols-2 gap-3 sm:gap-4">
+    <div *ngFor="let o of filtered" class="bg-white border border-maison-light-gray p-4 sm:p-6 space-y-4">
+      <div class="flex justify-between items-start gap-3">
+        <div class="min-w-0">
+          <p class="font-mono text-xs text-gray-400">{{ o.ref }} · {{ o.createdAt | date: 'dd/MM/yyyy HH:mm' }}</p>
+          <p class="font-medium mt-1 truncate">{{ o.customerName }}</p>
+          <p class="text-xs text-gray-500 truncate">{{ o.customerDistrict ? o.customerDistrict + ', ' : '' }}{{ o.customerAddress }}</p>
+        </div>
+        <span class="px-2.5 py-1 text-[9px] font-bold uppercase border shrink-0" [ngClass]="statusClass(o.status)">{{ o.status }}</span>
+      </div>
+
+      <div class="flex justify-between text-sm border-t border-maison-light-gray pt-3">
+        <span class="text-gray-500">{{ itemCount(o) }} article(s)</span>
+        <span class="font-semibold">{{ formatPrice(o.total) }}</span>
+      </div>
+
+      <div class="flex flex-wrap gap-2">
+        <a [href]="chatLink(o)" target="_blank" class="flex-1 min-w-[120px] text-center bg-[#25D366] text-white py-2.5 text-[10px] font-bold uppercase tracking-wide">
+          WhatsApp
+        </a>
+        <button *ngIf="o.status === 'En attente'" (click)="set(o, 'Expédié')" class="flex-1 min-w-[100px] border border-black py-2.5 text-[10px] font-bold uppercase tracking-wide">
+          Expédier
+        </button>
+        <button *ngIf="o.status === 'En attente' || o.status === 'Expédié'" (click)="set(o, 'Livré')" class="flex-1 min-w-[100px] bg-black text-white py-2.5 text-[10px] font-bold uppercase tracking-wide">
+          Livrée
+        </button>
+        <a [routerLink]="['/admin/order', o.id]" class="flex-1 min-w-[100px] text-center border border-maison-light-gray py-2.5 text-[10px] font-bold uppercase tracking-wide">
+          Détails
+        </a>
+      </div>
+    </div>
+  </div>
 </div>
-
-

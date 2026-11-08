@@ -1,4 +1,5 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, inject } from '@angular/core';
+import { SettingsService } from '../../../core/services/settings.service';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -24,11 +25,12 @@ import { CommonModule } from '@angular/common';
   `,
 })
 export class WhatsappButtonComponent {
-  @Input() phoneNumber: string = '33600000000'; // Remplacer par le vrai numéro
+  private settings = inject(SettingsService);
+
   @Input() defaultMessage: string = 'Bonjour Maison Shein, je souhaite des renseignements.';
 
+  /** Numéro lu dans les réglages de la boutique (onglet Réglages de l'admin). */
   get whatsappLink(): string {
-    const encodedMessage = encodeURIComponent(this.defaultMessage);
-    return `https://wa.me/${this.phoneNumber}?text=${encodedMessage}`;
+    return this.settings.whatsappLink(this.defaultMessage);
   }
 }

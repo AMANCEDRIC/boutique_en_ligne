@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { SettingsService } from '../../../core/services/settings.service';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -6,7 +7,7 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [CommonModule],
   template: `
-    <div class="min-h-screen pt-32 pb-20 px-4 md:px-8 max-w-3xl mx-auto">
+    <div class="min-h-screen pt-12 sm:pt-20 pb-20 px-4 md:px-8 max-w-3xl mx-auto">
       <h1 class="text-3xl font-serif text-center mb-12 uppercase tracking-widest">Moyens de paiement</h1>
       
       <p class="text-center text-gray-600 font-light mb-12">
@@ -34,11 +35,17 @@ import { CommonModule } from '@angular/common';
       <div class="mt-16 bg-black text-white p-8 text-center">
         <h3 class="font-serif text-2xl mb-4">Une question sur le paiement ?</h3>
         <p class="font-light text-white/80 mb-6 text-sm">Notre service client est à votre disposition pour toute précision lors de la validation WhatsApp.</p>
-        <a href="https://wa.me/33600000000" target="_blank" class="inline-block bg-white text-black px-6 py-2 label-caps text-[10px] hover:bg-gray-200 transition-colors">
+        <a [href]="whatsappLink" target="_blank" rel="noopener" class="inline-block bg-white text-black px-6 py-2 label-caps text-[10px] hover:bg-gray-200 transition-colors">
           Nous contacter
         </a>
       </div>
     </div>
   `
 })
-export class PaymentComponent {}
+export class PaymentComponent {
+  private settings = inject(SettingsService);
+
+  get whatsappLink(): string {
+    return this.settings.whatsappLink("Bonjour Maison Shein, j'ai une question sur le paiement.");
+  }
+}

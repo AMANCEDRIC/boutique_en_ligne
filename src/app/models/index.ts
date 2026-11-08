@@ -3,3 +3,5 @@ export * from './order.model';
 export * from './cart-item.model';
 export * from './review.model';
 
+export * from './category.model';
+export * from './settings.model';

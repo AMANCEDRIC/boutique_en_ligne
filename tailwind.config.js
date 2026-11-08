@@ -8,6 +8,8 @@ module.exports = {
       fontFamily: {
         serif: ['"Noto Serif"', 'serif'],
         sans: ['Inter', 'sans-serif'],
+        // Logo « Maison Shein » : Brush Script (Windows/macOS), Dancing Script (Android/iOS, chargée via Google Fonts)
+        script: ['"Brush Script MT"', '"Dancing Script"', 'cursive'],
       },
       colors: {
         'maison-gold': '#D4AF37',

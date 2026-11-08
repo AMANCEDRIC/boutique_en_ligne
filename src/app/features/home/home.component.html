@@ -1,127 +1,112 @@
 <div class="pb-12">
-  <!-- Hero Section: Pull up behind transparent navbar -->
-  <section class="relative h-[75vh] sm:h-[82vh] w-full overflow-hidden bg-maison-greige -mt-16">
-    <video autoplay loop muted playsinline
-      poster="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&q=80&w=2000"
-      class="absolute inset-0 w-full h-full object-cover opacity-80 scale-105 contrast-125 brightness-90"
-      src="https://videos.pexels.com/video-files/3744654/3744654-uhd_2560_1440_30fps.mp4">
-    </video>
+  <!-- Bandeau d'accueil (photo ou vidéo réglée dans l'admin) -->
+  <section class="relative h-[78vh] sm:h-[85vh] w-full overflow-hidden bg-black -mt-16">
+    <video *ngIf="hero.type === 'video'" autoplay loop muted playsinline [poster]="heroPoster" [src]="heroSrc(0)"
+      class="absolute inset-0 w-full h-full object-cover opacity-80"></video>
+    <img *ngIf="hero.type === 'image'" [src]="heroSrc(1800)" alt="Maison Shein"
+      class="absolute inset-0 w-full h-full object-cover opacity-85" />
 
-    <!-- Film Grain Overlay -->
-    <div class="absolute inset-0 opacity-[0.03] pointer-events-none mix-blend-overlay"
-      style="background-image: url('https://grainy-gradients.vercel.app/noise.svg');"></div>
-
-    <!-- Hero Overlay Content -->
-    <div
-      class="absolute inset-0 bg-black/40 flex flex-col items-center justify-center text-center p-4 sm:p-6 backdrop-brightness-95">
-      <div class="max-w-4xl mx-auto space-y-6 sm:space-y-8 animate-in fade-in slide-in-from-bottom-10 duration-1000">
-        
-        <h1 class="text-white text-5xl sm:text-7xl md:text-[90px] font-serif mb-2 sm:mb-4 tracking-tight leading-[1] sm:leading-[0.9]" style="font-family: 'Brush Script MT', 'Dancing Script', cursive;">
-          Maison Shein
-        </h1>
-
-        <p
-          class="text-white/95 text-xs sm:text-sm md:text-base max-w-2xl mx-auto font-sans tracking-wide font-light leading-relaxed">
-          Bienvenue dans l'univers Maison Shein. Découvrez notre collection de prêt-à-porter féminin et d'accessoires tendance, pensée pour sublimer chaque instant. Élégance, simplicité et qualité.
+    <div class="absolute inset-0 bg-gradient-to-b from-black/30 via-black/20 to-black/60 flex flex-col items-center justify-end sm:justify-center text-center p-5 pb-16 sm:p-6">
+      <div class="max-w-3xl mx-auto space-y-5 sm:space-y-7 animate-in fade-in slide-in-from-bottom-10 duration-1000">
+        <h1 class="font-script text-white text-6xl sm:text-7xl md:text-[96px] leading-[1]"
+        >Maison Shein</h1>
+        <p class="text-white/90 text-xs sm:text-sm md:text-base max-w-xl mx-auto font-light leading-relaxed">
+          Prêt-à-porter féminin, accessoires et perruques sélectionnés avec soin.
+          Commandez en quelques clics, nous confirmons tout avec vous sur WhatsApp.
         </p>
-
-        <div class="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4 sm:pt-8">
-          <button (click)="goShop()"
-            class="btn bg-white text-black border-none px-8 sm:px-10 py-3 sm:py-3.5 h-auto label-caps text-[9px] sm:text-[10px] hover:bg-gray-200 transition-all duration-500 w-full sm:w-auto">
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2 sm:pt-6">
+          <a routerLink="/shop" class="bg-white text-black px-10 py-3.5 label-caps text-[10px] hover:bg-gray-200 w-full sm:w-auto">
             Voir les articles
-          </button>
-          <a routerLink="/how-to-order"
-            class="btn bg-transparent border border-white text-white px-8 sm:px-10 py-3 sm:py-3.5 h-auto label-caps text-[9px] sm:text-[10px] hover:bg-white hover:text-black transition-all duration-500 w-full sm:w-auto flex items-center justify-center">
+          </a>
+          <a routerLink="/how-to-order" class="border border-white text-white px-10 py-3.5 label-caps text-[10px] hover:bg-white hover:text-black w-full sm:w-auto">
             Commander
           </a>
         </div>
       </div>
     </div>
-
-    <!-- Floating Scroll Indicator -->
-    <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex flex-col items-center space-y-2 hidden sm:flex">
-      <div class="w-[1px] h-6 bg-white/40 overflow-hidden">
-        <div class="w-full h-full bg-white origin-top animate-scroll-line"></div>
-      </div>
-    </div>
   </section>
 
-  <!-- Featured Collections Section -->
-  <section class="max-w-[1800px] mx-auto px-4 sm:px-6 md:px-12 reveal-on-scroll mt-8 sm:mt-12">
-    <div class="flex flex-row items-end justify-between mb-6 sm:mb-8 gap-4">
+  <!-- Rubriques -->
+  <section class="grid grid-cols-3 gap-1 sm:gap-2 mt-1 sm:mt-2">
+    <a *ngFor="let s of sections" routerLink="/shop" [queryParams]="{ section: s.slug }"
+      class="relative group overflow-hidden aspect-[3/4] sm:aspect-[4/5] bg-maison-greige">
+      <img [src]="sectionImage(s)" [alt]="s.id" loading="lazy"
+        class="absolute inset-0 w-full h-full object-cover duration-700 group-hover:scale-105" />
+      <div class="absolute inset-0 bg-black/30 group-hover:bg-black/15"></div>
+      <div class="absolute inset-0 flex flex-col items-center justify-end sm:justify-center pb-4 sm:pb-0 text-white">
+        <h2 class="text-sm sm:text-3xl font-serif uppercase tracking-tight">{{ s.id }}</h2>
+        <span class="hidden sm:inline-block label-caps border border-white px-4 py-1.5 text-[8px] mt-3 group-hover:bg-white group-hover:text-black">Découvrir</span>
+      </div>
+    </a>
+  </section>
+
+  <!-- Nouveautés -->
+  <section class="max-w-[1800px] mx-auto px-4 sm:px-6 md:px-12 mt-10 sm:mt-16">
+    <div class="flex items-end justify-between mb-6 sm:mb-8 gap-4">
       <div class="space-y-1 sm:space-y-2">
-        <span class="label-caps text-[8px] sm:text-[9px] text-gray-400">Nouvelle Collection</span>
+        <span class="label-caps text-[8px] sm:text-[9px] text-gray-400">Fraîchement arrivés</span>
         <h2 class="h2-editorial text-xl sm:text-3xl uppercase">Nouveautés</h2>
       </div>
-      <button (click)="goShop()"
-        class="label-caps text-[8px] sm:text-[9px] border-b border-black pb-0.5 hover:opacity-50 transition-opacity whitespace-nowrap">
-        Tout voir →
-      </button>
+      <a routerLink="/shop" [queryParams]="{ filter: 'new' }" class="label-caps text-[8px] sm:text-[9px] border-b border-black pb-0.5 whitespace-nowrap">Tout voir →</a>
     </div>
 
-    <!-- 2 Columns Grid on Mobile -->
-    <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-8">
-      <app-product-card *ngFor="let product of featuredProducts; let i = index" [product]="product"
+    <div *ngIf="loading" class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-8">
+      <div *ngFor="let i of [1, 2, 3, 4]" class="aspect-[3/4] bg-maison-greige animate-pulse"></div>
+    </div>
+    <div *ngIf="!loading" class="grid grid-cols-2 lg:grid-cols-4 gap-x-3 gap-y-8 sm:gap-8">
+      <app-product-card *ngFor="let product of newArrivals" [product]="product"
         (addToCart)="onAddToCart($event)" (toggleWishlist)="onToggleWishlist($event)"></app-product-card>
     </div>
   </section>
 
-  <!-- Split Banner Section -->
-  <section
-    class="grid grid-cols-1 md:grid-cols-2 h-[40vh] sm:h-[50vh] bg-maison-greige overflow-hidden reveal-on-scroll reveal-delay-2 mt-8 sm:mt-12">
-    <div (click)="goShop('vetements')" class="relative group cursor-pointer overflow-hidden">
-      <img src="https://images.unsplash.com/photo-1539109136881-3be0616acf4b?auto=format&fit=crop&q=80&w=1000"
-        class="absolute inset-0 w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700 scale-105 group-hover:scale-100"
-        alt="Vêtements">
-      <div class="absolute inset-0 bg-black/30 group-hover:bg-black/10 transition-colors"></div>
-      <div class="absolute inset-0 flex flex-col items-center justify-center text-white">
-        <h2 class="text-2xl sm:text-3xl font-serif mb-2 sm:mb-3 uppercase tracking-tight">Vêtements</h2>
-        <button
-          class="label-caps border border-white px-4 py-1.5 text-[8px] hover:bg-white hover:text-black transition-all">Explorer</button>
-      </div>
-    </div>
-    <div (click)="goShop('accessoires')" class="relative group cursor-pointer overflow-hidden">
-      <img src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&q=80&w=1000"
-        class="absolute inset-0 w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700 scale-105 group-hover:scale-100"
-        alt="Accessoires">
-      <div class="absolute inset-0 bg-black/30 group-hover:bg-black/10 transition-colors"></div>
-      <div class="absolute inset-0 flex flex-col items-center justify-center text-white">
-        <h2 class="text-2xl sm:text-3xl font-serif mb-2 sm:mb-3 uppercase tracking-tight">Accessoires</h2>
-        <button
-          class="label-caps border border-white px-4 py-1.5 text-[8px] hover:bg-white hover:text-black transition-all">Explorer</button>
-      </div>
-    </div>
-  </section>
+  <!-- Une rangée par rubrique, séparées par les bannières photo -->
+  <ng-container *ngFor="let row of rows">
+    <section *ngIf="row.banner" class="mt-12 sm:mt-20">
+      <a routerLink="/shop" [queryParams]="{ section: row.section.slug }" class="block relative h-[45vh] sm:h-[70vh] overflow-hidden group">
+        <img [src]="bannerSrc(row.banner)" [alt]="row.section.id" loading="lazy" class="absolute inset-0 w-full h-full object-cover duration-1000 group-hover:scale-105" />
+        <div class="absolute inset-0 bg-black/25 flex flex-col items-center justify-center text-white text-center px-4">
+          <h2 class="text-3xl sm:text-5xl font-serif uppercase tracking-tight">{{ row.section.id }}</h2>
+          <span class="label-caps border border-white px-6 py-2 text-[9px] mt-5 group-hover:bg-white group-hover:text-black">Découvrir</span>
+        </div>
+      </a>
+    </section>
 
-  <!-- Promotions Section -->
-  <section class="py-8 sm:py-12 reveal-on-scroll">
-    <div class="max-w-[1800px] mx-auto px-4 sm:px-6 md:px-12">
-      <div class="text-center mb-6 sm:mb-10 space-y-1 sm:space-y-2">
-        <span class="label-caps text-[8px] sm:text-[9px] text-maison-gold">Archive Sale</span>
-        <h2 class="h2-editorial text-xl sm:text-3xl uppercase">Offres Spéciales</h2>
+    <section class="max-w-[1800px] mx-auto px-4 sm:px-6 md:px-12 mt-10 sm:mt-16">
+      <div class="flex items-end justify-between mb-6 sm:mb-8 gap-4">
+        <h2 class="h2-editorial text-xl sm:text-3xl uppercase">{{ row.section.id }}</h2>
+        <a routerLink="/shop" [queryParams]="{ section: row.section.slug }" class="label-caps text-[8px] sm:text-[9px] border-b border-black pb-0.5 whitespace-nowrap">Tout voir →</a>
       </div>
-
-      <!-- 2 Columns Grid on Mobile -->
-      <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
-        <app-product-card *ngFor="let product of specialOffers" [product]="product" [compact]="true"
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-x-3 gap-y-8 sm:gap-8">
+        <app-product-card *ngFor="let product of row.products" [product]="product" [compact]="true"
           (addToCart)="onAddToCart($event)" (toggleWishlist)="onToggleWishlist($event)"></app-product-card>
       </div>
+    </section>
+  </ng-container>
+
+  <!-- Déstockage -->
+  <section *ngIf="sale.length" class="bg-maison-greige mt-12 sm:mt-20 py-10 sm:py-16">
+    <div class="max-w-[1800px] mx-auto px-4 sm:px-6 md:px-12">
+      <div class="text-center mb-6 sm:mb-10 space-y-1 sm:space-y-2">
+        <span class="label-caps text-[8px] sm:text-[9px] text-[#8a6d00]">Petits prix</span>
+        <h2 class="h2-editorial text-xl sm:text-3xl uppercase">Déstockage</h2>
+      </div>
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-x-3 gap-y-8 sm:gap-6">
+        <app-product-card *ngFor="let product of sale" [product]="product" [compact]="true"
+          (addToCart)="onAddToCart($event)" (toggleWishlist)="onToggleWishlist($event)"></app-product-card>
+      </div>
+      <div class="text-center mt-8">
+        <a routerLink="/shop" [queryParams]="{ filter: 'sale' }" class="label-caps text-[9px] border-b border-black pb-0.5">Tout le déstockage →</a>
+      </div>
     </div>
   </section>
 
-  <!-- Newsletter / Brand Story -->
-  <section class="max-w-2xl mx-auto px-4 text-center space-y-6 sm:space-y-8 pb-8 sm:pb-12 mt-8 sm:mt-12 reveal-on-scroll">
-    <div class="space-y-2 sm:space-y-3">
-      <h2 class="text-xl sm:text-2xl font-serif tracking-tight uppercase">Rejoignez l'Univers</h2>
-      <p class="text-gray-500 font-light text-[11px] sm:text-xs max-w-sm mx-auto">
-        Inscrivez-vous pour recevoir nos lookbooks exclusifs et nos nouveautés.
-      </p>
-    </div>
-
-    <div class="flex flex-col sm:flex-row gap-3 max-w-sm mx-auto">
-      <input type="email" placeholder="VOTRE EMAIL"
-        class="input-premium flex-grow py-2 text-[9px] tracking-widest uppercase">
-      <button class="bg-black text-white px-6 py-2 label-caps text-[8px] hover:bg-black/80">S'inscrire</button>
+  <!-- Réseaux sociaux -->
+  <section *ngIf="settings.tiktok || settings.instagram" class="max-w-2xl mx-auto px-4 text-center space-y-6 mt-14 sm:mt-20">
+    <h2 class="text-xl sm:text-2xl font-serif tracking-tight uppercase">Suivez nos arrivages</h2>
+    <p class="text-gray-500 font-light text-xs max-w-sm mx-auto">Nos nouveautés sont présentées en vidéo chaque semaine.</p>
+    <div class="flex flex-col sm:flex-row gap-3 justify-center">
+      <a *ngIf="settings.tiktok" [href]="settings.tiktok" target="_blank" rel="noopener" class="bg-black text-white px-8 py-3.5 label-caps text-[10px]">TikTok</a>
+      <a *ngIf="settings.instagram" [href]="settings.instagram" target="_blank" rel="noopener" class="border border-black px-8 py-3.5 label-caps text-[10px]">Instagram</a>
     </div>
   </section>
 </div>

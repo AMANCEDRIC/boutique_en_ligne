@@ -1,92 +1,122 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { Product, SubCategory } from '../../models/product.model';
-import { Review } from '../../models/review.model';
+import { Injectable, inject } from '@angular/core';
+import {
+  DocumentData,
+  Firestore,
+  addDoc,
+  collection,
+  collectionData,
+  deleteDoc,
+  doc,
+  orderBy,
+  query,
+  updateDoc,
+  writeBatch,
+} from '@angular/fire/firestore';
+import { Observable, ReplaySubject, map } from 'rxjs';
+import { Product } from '../../models/product.model';
 import { MOCK_PRODUCTS } from '../../constants/mock-products';
-import { StorageService } from './storage.service';
+import { isFirebaseConfigured } from '../../../environments/environment';
+import { slugify } from '../utils/format';
 
-const STORAGE_KEY = 'products_v2';
+/** Données saisies dans le formulaire admin (sans id ni champs calculés). */
+export type ProductInput = Omit<Product, 'id' | 'image' | 'createdAt' | 'reviews' | 'points'>;
 
-@Injectable({
-  providedIn: 'root',
-})
+/** Complète un document Firestore : `image` = 1re photo, `media` toujours présent. */
+function normalize(p: Product): Product {
+  const media = p.media?.length ? p.media : p.image ? [{ type: 'image' as const, url: p.image }] : [];
+  const cover = media.find((m) => m.type === 'image')?.url ?? p.image ?? '';
+  return { ...p, media, image: cover, sizes: p.sizes ?? [], stock: p.stock ?? 0 };
+}
+
+function demoProducts(): Product[] {
+  return MOCK_PRODUCTS.map((p, i) =>
+    normalize({ ...p, categoryId: slugify(p.category), createdAt: MOCK_PRODUCTS.length - i })
+  );
+}
+
+@Injectable({ providedIn: 'root' })
 export class ProductsService {
-  private productsSubject: BehaviorSubject<Product[]>;
-  products$: Observable<Product[]>;
+  private firestore = inject(Firestore);
+  private current: Product[] = [];
+  private subject = new ReplaySubject<Product[]>(1);
 
-  constructor(private storageService: StorageService) {
-    const initialProducts = this.loadInitialProducts();
-    this.productsSubject = new BehaviorSubject<Product[]>(initialProducts);
-    this.products$ = this.productsSubject.asObservable();
-  }
+  /** Catalogue en temps réel (émet après le premier chargement). */
+  readonly products$: Observable<Product[]> = this.subject.asObservable();
 
-  private loadInitialProducts(): Product[] {
-    const stored = this.storageService.getItem<Product[]>(STORAGE_KEY);
-    if (stored && stored.length > 0) {
-      return stored;
+  constructor() {
+    if (!isFirebaseConfigured) {
+      this.emit(demoProducts());
+      return;
     }
-    // Initialiser avec les mocks
-    this.storageService.setItem(STORAGE_KEY, MOCK_PRODUCTS);
-    return MOCK_PRODUCTS;
+    const q = query(collection(this.firestore, 'products'), orderBy('createdAt', 'desc'));
+    (collectionData(q, { idField: 'id' }) as Observable<Product[]>)
+      .pipe(map((list) => list.map(normalize)))
+      .subscribe({
+        next: (list) => this.emit(list),
+        error: (err) => {
+          console.error('Chargement des articles impossible :', err);
+          this.emit([]);
+        },
+      });
   }
 
-  private save(products: Product[]): void {
-    this.storageService.setItem(STORAGE_KEY, products);
-    this.productsSubject.next(products);
+  private emit(list: Product[]): void {
+    this.current = list;
+    this.subject.next(list);
   }
 
   getAll(): Product[] {
-    return this.productsSubject.value;
+    return this.current;
   }
 
-  getProducts(): Product[] {
-    return this.getAll();
+  /** Suit un article par id ; émet `null` s'il n'existe pas. */
+  watchById(id: string | null): Observable<Product | null> {
+    return this.products$.pipe(map((list) => list.find((p) => p.id === id) ?? null));
   }
 
-  getProductById(id: string | null): Product | null {
-    if (!id) return null;
-    return this.getAll().find((p) => p.id === id) || null;
+  async addProduct(input: ProductInput): Promise<void> {
+    await addDoc(collection(this.firestore, 'products'), this.toDoc(input, Date.now()));
   }
 
-  addProduct(partial: { name: string; price: number; category: SubCategory; description?: string; image?: string; stock?: number }): void {
-    const newProduct: Product = {
-      id: crypto.randomUUID(),
-      name: partial.name,
-      price: partial.price,
-      category: partial.category,
-      description: partial.description || '',
-      image: partial.image || 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&q=80&w=1000',
-      sizes: ['S', 'M', 'L'],
-      stock: partial.stock !== undefined ? partial.stock : 10,
-    };
-
-    const updated = [...this.productsSubject.value, newProduct];
-    this.save(updated);
+  async updateProduct(id: string, input: ProductInput): Promise<void> {
+    await updateDoc(doc(this.firestore, 'products', id), this.toDoc(input));
   }
 
-  updateProduct(id: string, updates: Partial<Product>): void {
-    const current = this.getAll();
-    this.save(current.map((p) => (p.id === id ? { ...p, ...updates } : p)));
+  async setStock(id: string, stock: number): Promise<void> {
+    await updateDoc(doc(this.firestore, 'products', id), { stock: Math.max(0, stock) });
   }
 
-  deleteProduct(id: string): void {
-    const updated = this.productsSubject.value.filter((p) => p.id !== id);
-    this.save(updated);
+  async deleteProduct(id: string): Promise<void> {
+    await deleteDoc(doc(this.firestore, 'products', id));
   }
 
-  addReview(productId: string, review: Review): void {
-    const current = this.getAll();
-    this.save(
-      current.map((p) =>
-        p.id === productId
-          ? { ...p, reviews: [...(p.reviews || []), review] }
-          : p
-      )
-    );
+  /** Renomme la catégorie dénormalisée sur tous les articles concernés. */
+  async renameCategoryOnProducts(categoryId: string, newName: string): Promise<void> {
+    const affected = this.current.filter((p) => p.categoryId === categoryId);
+    if (!affected.length) return;
+    const batch = writeBatch(this.firestore);
+    affected.forEach((p) => batch.update(doc(this.firestore, 'products', p.id), { category: newName }));
+    await batch.commit();
+  }
+
+  /** Pousse les articles de démonstration dans Firestore (bouton admin, une seule fois). */
+  async importDemoProducts(): Promise<void> {
+    const batch = writeBatch(this.firestore);
+    demoProducts().forEach(({ id, ...p }) => {
+      batch.set(doc(collection(this.firestore, 'products')), { ...p, createdAt: Date.now() - Number(id) });
+    });
+    await batch.commit();
   }
 
   getTotalStock(): number {
-    return this.productsSubject.value.reduce((sum, p) => sum + p.stock, 0);
+    return this.current.reduce((sum, p) => sum + (p.stock || 0), 0);
+  }
+
+  private toDoc(input: ProductInput, createdAt?: number): DocumentData {
+    const media = input.media ?? [];
+    const image = media.find((m) => m.type === 'image')?.url ?? '';
+    const data: DocumentData = { ...input, media, image };
+    if (createdAt) data['createdAt'] = createdAt;
+    return data;
   }
 }
-

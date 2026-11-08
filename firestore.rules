@@ -1,0 +1,67 @@
+rules_version = '2';
+
+// Règles de sécurité Firestore — Maison Shein
+// Déploiement : `npx firebase-tools deploy --only firestore:rules --project <projectId>`
+// (ou copier-coller dans Console Firebase > Firestore > Règles).
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Un admin = un compte Firebase Auth dont l'UID a un document dans /admins.
+    function isAdmin() {
+      return request.auth != null
+        && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+
+    function optionalString(data, field, max) {
+      return !(field in data) || (data[field] is string && data[field].size() <= max);
+    }
+
+    // Commande créée par une cliente (sans compte) depuis la page panier.
+    function isValidNewOrder(o) {
+      return o.keys().hasAll(['ref', 'date', 'createdAt', 'customerName', 'customerPhone',
+                              'customerAddress', 'items', 'total', 'status'])
+        && o.keys().hasOnly(['ref', 'date', 'createdAt', 'customerName', 'customerPhone',
+                             'customerWhatsapp', 'customerAddress', 'customerDistrict', 'notes',
+                             'items', 'total', 'status', 'paymentMethod'])
+        && o.status == 'En attente'
+        && o.ref is string && o.ref.size() <= 20
+        && o.date is string && o.date.size() <= 20
+        && o.createdAt is int
+        && o.customerName is string && o.customerName.size() > 0 && o.customerName.size() <= 100
+        && o.customerPhone is string && o.customerPhone.size() > 0 && o.customerPhone.size() <= 40
+        && o.customerAddress is string && o.customerAddress.size() > 0 && o.customerAddress.size() <= 300
+        && optionalString(o, 'customerWhatsapp', 40)
+        && optionalString(o, 'customerDistrict', 200)
+        && optionalString(o, 'notes', 1000)
+        && optionalString(o, 'paymentMethod', 100)
+        && o.items is list && o.items.size() > 0 && o.items.size() <= 50
+        && o.total is number && o.total >= 0;
+    }
+
+    match /admins/{uid} {
+      // Chaque utilisateur peut seulement vérifier son propre statut. Création à la main dans la console.
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow write: if false;
+    }
+
+    match /products/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /categories/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /settings/{id} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /orders/{id} {
+      allow create: if isValidNewOrder(request.resource.data);
+      allow read, update, delete: if isAdmin();
+    }
+  }
+}

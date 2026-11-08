@@ -1,7 +1,9 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { Product } from '../../../models/product.model';
+import { Product, hasVideo } from '../../../models/product.model';
+import { cldUrl } from '../../../core/services/media.service';
+import { formatPrice } from '../../../core/utils/format';
 
 @Component({
   selector: 'app-product-card',
@@ -18,9 +20,14 @@ export class ProductCardComponent {
   @Output() toggleWishlist = new EventEmitter<Product>();
   
   addedToCart = false;
+  hasVideo = hasVideo;
+
+  get imageUrl(): string {
+    return cldUrl(this.product.image, this.compact ? 'w_400,f_auto,q_auto' : 'w_600,f_auto,q_auto');
+  }
 
   formatPrice(price: number): string {
-    return new Intl.NumberFormat('fr-FR').format(price) + ' FCFA';
+    return formatPrice(price);
   }
 
   onAddToCart(event: MouseEvent): void {

@@ -34,6 +34,11 @@
     @apply border-0 border-b border-maison-light-gray focus:border-black focus:outline-none bg-transparent px-0;
   }
 
+  /* Liens du menu principal (desktop) */
+  .nav-link {
+    @apply font-sans text-[10px] xl:text-[11px] font-semibold uppercase tracking-[0.12em] xl:tracking-[0.14em] whitespace-nowrap transition-colors;
+  }
+
   /* Label Caps */
   .label-caps {
     @apply font-sans text-[12px] font-bold uppercase tracking-[0.1em];

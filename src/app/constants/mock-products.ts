@@ -99,6 +99,31 @@ export const MOCK_PRODUCTS: Product[] = [
     isSale: true,
     points: 30,
     reviews: []
+  },
+  {
+    id: '9',
+    name: 'Perruque Lace Front Lisse',
+    price: 85000,
+    description: 'Cheveux naturels lisses, lace transparente invisible, densité 180 %. Pose naturelle et confortable.',
+    image: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&q=80&w=800',
+    mainCategory: 'Perruques',
+    category: 'Lace front',
+    sizes: ['14"', '18"', '22"', '26"'],
+    stock: 6,
+    isNew: true,
+    reviews: []
+  },
+  {
+    id: '10',
+    name: 'Perruque Bob Bouclée',
+    price: 55000,
+    description: 'Coupe bob courte aux boucles définies, prête à porter. Idéale pour un look chic au quotidien.',
+    image: 'https://images.unsplash.com/photo-1595959183082-7b570b7e08e2?auto=format&fit=crop&q=80&w=800',
+    mainCategory: 'Perruques',
+    category: 'Bob',
+    sizes: ['10"', '12"'],
+    stock: 4,
+    reviews: []
   }
 ];
 

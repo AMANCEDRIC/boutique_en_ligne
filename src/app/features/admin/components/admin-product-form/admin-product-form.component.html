@@ -1,0 +1,119 @@
+<div class="fixed inset-0 z-50 bg-black/40 lg:flex lg:items-center lg:justify-center lg:p-8" (click)="cancel()">
+  <form
+    (ngSubmit)="save()"
+    (click)="$event.stopPropagation()"
+    class="bg-white w-full h-full lg:h-auto lg:max-h-[90vh] lg:max-w-3xl flex flex-col"
+  >
+    <!-- En-tête -->
+    <div class="flex items-center justify-between px-4 sm:px-8 h-14 sm:h-16 border-b border-maison-light-gray shrink-0">
+      <button type="button" (click)="cancel()" class="p-2 -ml-2 text-gray-500 hover:text-black" aria-label="Fermer">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="1.5" d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+      <h2 class="label-caps text-[11px]">{{ isEdit ? 'Modifier l’article' : 'Nouvel article' }}</h2>
+      <span class="w-9"></span>
+    </div>
+
+    <!-- Contenu -->
+    <div class="flex-1 overflow-y-auto px-4 sm:px-8 py-6 space-y-8">
+      <section class="space-y-3">
+        <h3 class="label-caps text-[10px]">Photos & vidéos</h3>
+        <p class="text-xs text-gray-500">La première photo sert de couverture. Les vidéos de TikTok / WhatsApp sont acceptées (100 Mo max).</p>
+        <app-media-uploader [(media)]="media" (busyChange)="uploading = $event"></app-media-uploader>
+      </section>
+
+      <section class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+        <label class="block space-y-2 sm:col-span-2">
+          <span class="label-caps text-[9px]">Nom de l’article *</span>
+          <input name="name" [(ngModel)]="name" required placeholder="Ex. Robe satinée émeraude"
+            class="w-full border border-maison-light-gray px-3 py-3 text-sm focus:border-black outline-none" />
+        </label>
+
+        <label class="block space-y-2">
+          <span class="label-caps text-[9px]">Prix (FCFA) *</span>
+          <input name="price" type="number" inputmode="numeric" min="0" [(ngModel)]="price" required
+            class="w-full border border-maison-light-gray px-3 py-3 text-sm focus:border-black outline-none" />
+        </label>
+
+        <label class="block space-y-2">
+          <span class="label-caps text-[9px]">Stock</span>
+          <input name="stock" type="number" inputmode="numeric" min="0" [(ngModel)]="stock"
+            class="w-full border border-maison-light-gray px-3 py-3 text-sm focus:border-black outline-none" />
+        </label>
+      </section>
+
+      <section class="space-y-3">
+        <h3 class="label-caps text-[10px]">Rubrique *</h3>
+        <div class="grid grid-cols-3 gap-2">
+          <button *ngFor="let s of sections" type="button" (click)="section = s.id; onSectionChange()"
+            class="py-3 border text-[10px] font-semibold uppercase tracking-wide"
+            [ngClass]="section === s.id ? 'bg-black text-white border-black' : 'border-maison-light-gray text-gray-600'">
+            {{ s.id }}
+          </button>
+        </div>
+        <div class="flex flex-wrap gap-2 pt-1">
+          <button *ngFor="let c of sectionCategories" type="button" (click)="categoryId = c.id"
+            class="px-4 py-2 border text-xs"
+            [ngClass]="categoryId === c.id ? 'bg-black text-white border-black' : 'border-maison-light-gray text-gray-600'">
+            {{ c.name }}
+          </button>
+          <span *ngIf="!sectionCategories.length" class="text-xs text-gray-500">Aucune catégorie dans cette rubrique : créez-en une dans l’onglet Catégories.</span>
+        </div>
+      </section>
+
+      <section class="space-y-3">
+        <h3 class="label-caps text-[10px]">{{ sizeLabel }}</h3>
+        <div class="flex flex-wrap gap-2">
+          <button *ngFor="let p of orderedPresets" type="button" (click)="applyPreset(p.sizes)"
+            class="text-[10px] uppercase tracking-wide border-b border-gray-300 pb-0.5 mr-3 text-gray-500 hover:text-black">
+            {{ p.label }}
+          </button>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          <button *ngFor="let size of orderedPresets[0].sizes" type="button" (click)="toggleSize(size)"
+            class="min-w-[48px] px-3 py-2 border text-xs"
+            [ngClass]="sizes.includes(size) ? 'bg-black text-white border-black' : 'border-maison-light-gray text-gray-600'">
+            {{ size }}
+          </button>
+          <ng-container *ngFor="let size of sizes">
+            <button *ngIf="!orderedPresets[0].sizes.includes(size)" type="button" (click)="toggleSize(size)"
+              class="min-w-[48px] px-3 py-2 border text-xs bg-black text-white border-black">{{ size }} ✕</button>
+          </ng-container>
+        </div>
+        <div class="flex gap-2 max-w-xs">
+          <input name="customSize" [(ngModel)]="customSize" placeholder="Autre (ex. 42, 32&quot;)" (keydown.enter)="$event.preventDefault(); addCustomSize()"
+            class="flex-1 border border-maison-light-gray px-3 py-2 text-xs focus:border-black outline-none" />
+          <button type="button" (click)="addCustomSize()" class="border border-black px-4 text-xs">Ajouter</button>
+        </div>
+      </section>
+
+      <label class="block space-y-2">
+        <span class="label-caps text-[9px]">Description</span>
+        <textarea name="description" [(ngModel)]="description" rows="4" placeholder="Matière, coupe, conseils…"
+          class="w-full border border-maison-light-gray px-3 py-3 text-sm focus:border-black outline-none"></textarea>
+      </label>
+
+      <section class="flex flex-wrap gap-6">
+        <label class="flex items-center gap-3 cursor-pointer">
+          <input type="checkbox" name="isNew" [(ngModel)]="isNew" class="checkbox checkbox-sm rounded-none" />
+          <span class="text-sm">Nouveauté</span>
+        </label>
+        <label class="flex items-center gap-3 cursor-pointer">
+          <input type="checkbox" name="isSale" [(ngModel)]="isSale" class="checkbox checkbox-sm rounded-none" />
+          <span class="text-sm">Déstockage / promo</span>
+        </label>
+      </section>
+    </div>
+
+    <!-- Pied -->
+    <div class="border-t border-maison-light-gray px-4 sm:px-8 py-4 space-y-3 shrink-0 pb-[max(1rem,env(safe-area-inset-bottom))]">
+      <p *ngIf="error" class="text-xs text-red-600">{{ error }}</p>
+      <div class="flex gap-3">
+        <button type="button" (click)="cancel()" class="flex-1 sm:flex-none sm:px-10 border border-black py-4 label-caps text-[10px]">Annuler</button>
+        <button type="submit" [disabled]="saving || uploading"
+          class="flex-[2] sm:flex-none sm:px-12 bg-black text-white py-4 label-caps text-[10px] disabled:opacity-40">
+          {{ saving ? 'Enregistrement…' : uploading ? 'Envoi des médias…' : isEdit ? 'Enregistrer' : 'Publier l’article' }}
+        </button>
+      </div>
+    </div>
+  </form>
+</div>

@@ -1,7 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { OrdersService } from '../../core/services/orders.service';
+import { SettingsService } from '../../core/services/settings.service';
+import { cldUrl } from '../../core/services/media.service';
+import { formatPrice } from '../../core/utils/format';
 import { Order } from '../../models';
 
 @Component({
@@ -9,35 +12,29 @@ import { Order } from '../../models';
   standalone: true,
   imports: [CommonModule, RouterModule],
   templateUrl: './order-confirmation.component.html',
-  styleUrl: './order-confirmation.component.scss',
 })
 export class OrderConfirmationComponent implements OnInit {
-  order: Order | null = null;
-  orderId: string | null = null;
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private ordersService = inject(OrdersService);
+  private settings = inject(SettingsService);
 
-  constructor(
-    private route: ActivatedRoute,
-    private router: Router,
-    private ordersService: OrdersService
-  ) {}
+  /** Lue depuis sessionStorage : le public n'a pas accès en lecture à la collection `orders`. */
+  order: Omit<Order, 'id'> | null = null;
+  formatPrice = formatPrice;
 
   ngOnInit(): void {
-    this.orderId = this.route.snapshot.paramMap.get('id');
-    
-    if (this.orderId) {
-      this.order = this.ordersService.getById(this.orderId);
-      
-      if (!this.order) {
-        // Si la commande n'existe pas, rediriger vers la boutique
-        this.router.navigateByUrl('/shop');
-      }
-    } else {
-      this.router.navigateByUrl('/shop');
-    }
+    const ref = this.route.snapshot.paramMap.get('ref');
+    const last = this.ordersService.getLastOrder();
+    this.order = last && last.ref === ref ? last : null;
   }
 
-  formatPrice(price: number): string {
-    return new Intl.NumberFormat('fr-FR').format(price) + ' FCFA';
+  thumb(url: string): string {
+    return cldUrl(url, 'w_160,f_auto,q_auto');
+  }
+
+  get whatsappLink(): string {
+    return this.order ? this.settings.whatsappLink(this.ordersService.whatsappMessage(this.order)) : this.settings.whatsappLink();
   }
 
   goToShop(): void {
@@ -48,4 +45,3 @@ export class OrderConfirmationComponent implements OnInit {
     this.router.navigateByUrl('/');
   }
 }
-

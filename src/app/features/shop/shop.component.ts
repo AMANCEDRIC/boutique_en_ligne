@@ -1,157 +1,164 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, DestroyRef, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule, ActivatedRoute, Router } from '@angular/router';
+import { RouterModule, ActivatedRoute, Router, Params } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { combineLatest } from 'rxjs';
 import { ProductsService } from '../../core/services/products.service';
+import { CategoriesService } from '../../core/services/categories.service';
 import { CartService } from '../../core/services/cart.service';
 import { WishlistService } from '../../core/services/wishlist.service';
-import { Product, Size, MainCategory, SubCategory } from '../../models';
+import { Category, Product, SECTIONS, SectionInfo, Size, sectionBySlug } from '../../models';
 import { ProductCardComponent } from '../../shared/components/product-card/product-card.component';
 
+type Sort = 'newest' | 'price-asc' | 'price-desc';
+
+/**
+ * Catalogue. L'URL est la source de vérité des filtres :
+ * /shop?section=perruques&category=bob&size=12"&filter=new|sale&q=robe&sort=price-asc
+ */
 @Component({
   selector: 'app-shop',
   standalone: true,
   imports: [CommonModule, RouterModule, ProductCardComponent],
   templateUrl: './shop.component.html',
-  styleUrl: './shop.component.scss',
 })
 export class ShopComponent implements OnInit {
+  private productsService = inject(ProductsService);
+  private categoriesService = inject(CategoriesService);
+  private cartService = inject(CartService);
+  private wishlistService = inject(WishlistService);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private destroyRef = inject(DestroyRef);
+
+  sections = SECTIONS;
   allProducts: Product[] = [];
+  allCategories: Category[] = [];
   filteredProducts: Product[] = [];
-  
-  // Filtres
-  activeFilter: string = 'all'; // Peut être 'all', 'vetements', 'Accessoires', 'new', 'sale'
-  selectedCategory: SubCategory | 'all' = 'all';
-  selectedSize: Size | 'all' = 'all';
-  sortBy: 'newest' | 'price-asc' | 'price-desc' = 'newest';
+  loading = true;
 
-  // Liste des sous-catégories pour les filtres (exemple basique)
-  availableCategories: SubCategory[] = ['Robes', 'Ensembles', 'Hauts', 'Bas', 'Sacs', 'Sandales', 'Bijoux', 'Premium'];
-  availableSizes: Size[] = ['TU', 'XS', 'S', 'M', 'L', 'XL', 'XXL', '37', '38', '39', '40'];
+  section: SectionInfo | undefined;
+  categoryId = '';
+  flag: 'new' | 'sale' | '' = '';
+  size: Size | '' = '';
+  q = '';
+  sortBy: Sort = 'newest';
 
-  constructor(
-    private productsService: ProductsService,
-    private cartService: CartService,
-    private wishlistService: WishlistService,
-    private route: ActivatedRoute,
-    private router: Router
-  ) {}
+  /** Catégories proposées (celles de la rubrique active, sinon toutes). */
+  categories: Category[] = [];
+  sizes: Size[] = [];
+
+  get title(): string {
+    if (this.q) return `« ${this.q} »`;
+    if (this.flag === 'new') return 'Nouveautés';
+    if (this.flag === 'sale') return 'Déstockage';
+    return this.section?.id ?? 'Collection';
+  }
+
+  get sizeTitle(): string {
+    return this.section?.slug === 'perruques' ? 'Longueurs' : 'Tailles';
+  }
+
+  get hasFilters(): boolean {
+    return !!(this.section || this.categoryId || this.flag || this.size || this.q);
+  }
 
   ngOnInit(): void {
-    this.productsService.products$.subscribe((products) => {
-      this.allProducts = products;
-      this.applyFilters();
-    });
+    combineLatest([this.productsService.products$, this.categoriesService.categories$, this.route.queryParamMap])
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(([products, categories, params]) => {
+        this.allProducts = products;
+        this.allCategories = categories;
+        this.loading = false;
 
-    this.route.queryParams.subscribe(params => {
-      const filter = params['filter'];
-      const category = params['category']; // Pour la recherche de sous-catégorie directe ou Accessoires
+        // Compatibilité avec les anciens liens (?filter=vetements, ?category=Accessoires)
+        const legacy = params.get('filter');
+        const legacyCategory = params.get('category');
+        this.section =
+          sectionBySlug(params.get('section')) ??
+          sectionBySlug(legacy) ??
+          (legacyCategory === 'Accessoires' ? sectionBySlug('accessoires') : undefined);
+        this.categoryId = legacyCategory === 'Accessoires' ? '' : legacyCategory ?? '';
+        this.flag = legacy === 'new' || legacy === 'sale' ? legacy : '';
+        this.size = params.get('size') ?? '';
+        this.q = params.get('q') ?? '';
+        const sort = params.get('sort') as Sort | null;
+        this.sortBy = sort === 'price-asc' || sort === 'price-desc' ? sort : 'newest';
 
-      if (filter) {
-        this.activeFilter = filter;
-      } else if (category === 'Accessoires') {
-        this.activeFilter = 'Accessoires';
-      } else {
-        this.activeFilter = 'all';
-      }
-      
-      // Si on a passé une catégorie spécifique (autre que Accessoires)
-      if (category && category !== 'Accessoires' && this.availableCategories.includes(category as SubCategory)) {
-        this.selectedCategory = category as SubCategory;
-      } else {
-        this.selectedCategory = 'all';
-      }
+        // Une catégorie sans rubrique explicite fixe la rubrique
+        const cat = categories.find((c) => c.id === this.categoryId);
+        if (cat && !this.section) this.section = SECTIONS.find((s) => s.id === cat.section);
 
-      this.applyFilters();
-    });
+        this.applyFilters();
+      });
   }
 
-  applyFilters(): void {
-    let filtered = [...this.allProducts];
+  private applyFilters(): void {
+    const inSection = this.allProducts.filter((p) => !this.section || p.mainCategory === this.section.id);
+    this.categories = this.allCategories.filter((c) => !this.section || c.section === this.section.id);
 
-    // Filtre navbar
-    if (this.activeFilter === 'new') {
-      filtered = filtered.filter(p => p.isNew === true);
-    } else if (this.activeFilter === 'sale') {
-      filtered = filtered.filter(p => p.isSale === true);
-    } else if (this.activeFilter === 'vetements') {
-      filtered = filtered.filter(p => p.mainCategory === 'Vêtements');
-    } else if (this.activeFilter === 'Accessoires') {
-      filtered = filtered.filter(p => p.mainCategory === 'Accessoires');
-    }
+    const q = this.q.toLowerCase();
+    let list = inSection.filter(
+      (p) =>
+        (!this.categoryId || p.categoryId === this.categoryId) &&
+        (this.flag !== 'new' || p.isNew) &&
+        (this.flag !== 'sale' || p.isSale) &&
+        (!q || `${p.name} ${p.category} ${p.description}`.toLowerCase().includes(q))
+    );
 
-    // Filtre par sous-catégorie
-    if (this.selectedCategory !== 'all') {
-      filtered = filtered.filter(p => p.category === this.selectedCategory);
-    }
+    // Tailles proposées = celles des articles visibles (avant filtre de taille)
+    this.sizes = [...new Set(list.flatMap((p) => p.sizes))].filter((s) => s !== 'TU');
+    if (this.size) list = list.filter((p) => p.sizes.includes(this.size));
 
-    // Filtre par taille
-    if (this.selectedSize !== 'all') {
-      filtered = filtered.filter(p => p.sizes.includes(this.selectedSize as Size));
-    }
+    if (this.sortBy === 'price-asc') list = [...list].sort((a, b) => a.price - b.price);
+    else if (this.sortBy === 'price-desc') list = [...list].sort((a, b) => b.price - a.price);
+    // 'newest' : ordre Firestore (createdAt décroissant)
 
-    // Tri
-    this.sortProducts(filtered);
-    
-    this.filteredProducts = filtered;
+    // Les articles épuisés passent en fin de liste
+    list = [...list.filter((p) => p.stock > 0), ...list.filter((p) => p.stock <= 0)];
+
+    this.filteredProducts = list;
   }
 
-  sortProducts(products: Product[]): void {
-    switch (this.sortBy) {
-      case 'newest':
-        products.sort((a, b) => {
-          const aNew = a.isNew ? 1 : 0;
-          const bNew = b.isNew ? 1 : 0;
-          return bNew - aNew;
-        });
-        break;
-      case 'price-asc':
-        products.sort((a, b) => a.price - b.price);
-        break;
-      case 'price-desc':
-        products.sort((a, b) => b.price - a.price);
-        break;
-    }
+  private nav(patch: Params, reset = false): void {
+    const base: Params = reset
+      ? {}
+      : {
+          section: this.section?.slug ?? null,
+          category: this.categoryId || null,
+          filter: this.flag || null,
+          size: this.size || null,
+          q: this.q || null,
+          sort: this.sortBy === 'newest' ? null : this.sortBy,
+        };
+    this.router.navigate(['/shop'], { queryParams: { ...base, ...patch } });
   }
 
-  onFilterChange(filter: string): void {
-    this.activeFilter = filter;
-    this.selectedCategory = 'all';
-    this.router.navigate(['/shop'], { 
-      queryParams: { filter: filter === 'all' ? null : filter } 
-    });
+  setSection(slug: string | null): void {
+    this.nav({ section: slug, category: null, size: null });
   }
 
-  onCategoryChange(category: any): void {
-    this.selectedCategory = category as SubCategory | 'all';
-    this.applyFilters();
+  setCategory(id: string | null): void {
+    this.nav({ category: id, size: null });
   }
 
-  onSizeChange(size: Size | 'all'): void {
-    this.selectedSize = size;
-    this.applyFilters();
+  toggleSize(size: Size): void {
+    this.nav({ size: this.size === size ? null : size });
   }
 
-  toggleSize(sizeStr: string): void {
-    const size = sizeStr as Size;
-    if (this.selectedSize === size) {
-      this.onSizeChange('all');
-    } else {
-      this.onSizeChange(size);
-    }
+  onSortChange(sort: Sort): void {
+    this.nav({ sort: sort === 'newest' ? null : sort });
   }
 
-  onSortChange(sort: 'newest' | 'price-asc' | 'price-desc'): void {
-    this.sortBy = sort;
-    this.applyFilters();
+  clearAll(): void {
+    this.nav({}, true);
   }
 
   onAddToCart(product: Product): void {
-    const defaultSize: Size = (product.sizes && product.sizes.length > 0) ? product.sizes[0] : 'TU';
-    this.cartService.addToCart(product, defaultSize);
+    this.cartService.addToCart(product, product.sizes[0] ?? 'TU');
   }
 
   onToggleWishlist(product: Product): void {
     this.wishlistService.toggle(product);
   }
 }
-

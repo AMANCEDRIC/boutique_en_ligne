@@ -1,52 +1,51 @@
-<div class="space-y-12">
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
-    <!-- Stat Card -->
-    <div class="bg-white p-10 border border-maison-light-gray shadow-ambient">
-      <p class="label-caps text-[10px] text-gray-400 mb-6 tracking-[0.2em]">Chiffre d'Affaires</p>
-      <p class="text-4xl font-sans tracking-tighter">{{ formatPriceFn(1245000) }}</p>
-      <div class="mt-6 flex items-center gap-2">
-        <span class="text-green-500 text-[10px] font-bold">↑ 12%</span>
-        <span class="label-caps text-[8px] text-gray-300">vs mois dernier</span>
-      </div>
-    </div>
+<div class="space-y-6 sm:space-y-10">
+  <!-- Actions rapides -->
+  <div class="grid grid-cols-2 gap-3 sm:flex sm:gap-4">
+    <button (click)="goTo.emit('products')" class="bg-black text-white py-4 px-6 label-caps text-[10px] hover:bg-black/90">+ Ajouter un article</button>
+    <button (click)="goTo.emit('orders')" class="border border-black py-4 px-6 label-caps text-[10px] hover:bg-white">Voir les commandes</button>
+  </div>
 
-    <!-- Stat Card -->
-    <div class="bg-white p-10 border border-maison-light-gray shadow-ambient">
-      <p class="label-caps text-[10px] text-gray-400 mb-6 tracking-[0.2em]">Commandes Totales</p>
-      <p class="text-4xl font-sans tracking-tighter">342</p>
-      <div class="mt-6 flex items-center gap-2">
-        <span class="text-maison-gold text-[10px] font-bold">●</span>
-        <span class="label-caps text-[8px] text-gray-300">En progression</span>
-      </div>
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
+    <div class="bg-white p-5 sm:p-8 border border-maison-light-gray">
+      <p class="label-caps text-[9px] text-gray-400 mb-3">Commandes à traiter</p>
+      <p class="text-3xl sm:text-4xl tracking-tighter">{{ pending.length }}</p>
     </div>
-
-    <!-- Stat Card -->
-    <div class="bg-white p-10 border border-maison-light-gray shadow-ambient">
-      <p class="label-caps text-[10px] text-gray-400 mb-6 tracking-[0.2em]">Stock Actuel</p>
-      <p class="text-4xl font-sans tracking-tighter">{{ totalStock }}</p>
-      <div class="mt-6 flex items-center gap-2">
-        <span class="text-orange-400 text-[10px] font-bold">!</span>
-        <span class="label-caps text-[8px] text-gray-300">8 articles en rupture</span>
-      </div>
+    <div class="bg-white p-5 sm:p-8 border border-maison-light-gray">
+      <p class="label-caps text-[9px] text-gray-400 mb-3">Ventes livrées</p>
+      <p class="text-lg sm:text-2xl tracking-tighter">{{ formatPrice(revenue) }}</p>
+    </div>
+    <div class="bg-white p-5 sm:p-8 border border-maison-light-gray">
+      <p class="label-caps text-[9px] text-gray-400 mb-3">Articles en ligne</p>
+      <p class="text-3xl sm:text-4xl tracking-tighter">{{ products.length }}</p>
+    </div>
+    <div class="bg-white p-5 sm:p-8 border border-maison-light-gray">
+      <p class="label-caps text-[9px] text-gray-400 mb-3">Pièces en stock</p>
+      <p class="text-3xl sm:text-4xl tracking-tighter">{{ totalStock }}</p>
     </div>
   </div>
 
-  <!-- Analytics Viewport -->
-  <div class="bg-white border border-maison-light-gray shadow-ambient">
-    <div class="p-10 border-b border-maison-light-gray flex justify-between items-center">
-       <h4 class="label-caps text-[11px]">Analyse des Ventes</h4>
-       <div class="flex gap-4">
-          <button class="label-caps text-[9px] border-b border-black pb-1">7 Jours</button>
-          <button class="label-caps text-[9px] text-gray-300 hover:text-black transition-colors">30 Jours</button>
-       </div>
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <!-- Par section -->
+    <div class="bg-white border border-maison-light-gray p-5 sm:p-8">
+      <h3 class="label-caps text-[10px] mb-5">Articles par section</h3>
+      <div *ngFor="let s of sections" class="flex justify-between py-3 border-b border-maison-light-gray last:border-0 text-sm">
+        <span>{{ s.id }}</span>
+        <span class="font-semibold">{{ countBySection(s.id) }}</span>
+      </div>
     </div>
-    <div class="h-[500px] bg-maison-greige/30 flex items-center justify-center p-20">
-      <div class="w-full h-full border border-dashed border-gray-200 flex flex-col items-center justify-center space-y-6">
-        <div class="w-12 h-12 border-2 border-maison-gold rounded-full border-t-transparent animate-spin opacity-20"></div>
-        <p class="label-caps text-[10px] text-gray-400">Génération du rapport analytique...</p>
+
+    <!-- Alertes stock -->
+    <div class="bg-white border border-maison-light-gray p-5 sm:p-8">
+      <h3 class="label-caps text-[10px] mb-5">Alertes stock</h3>
+      <p *ngIf="!outOfStock.length && !lowStock.length" class="text-sm text-gray-400">Aucune alerte.</p>
+      <div *ngFor="let p of outOfStock" class="flex justify-between items-center py-2.5 text-sm border-b border-maison-light-gray last:border-0">
+        <span class="truncate pr-3">{{ p.name }}</span>
+        <span class="label-caps text-[8px] text-red-600 border border-red-200 px-2 py-1 shrink-0">Épuisé</span>
+      </div>
+      <div *ngFor="let p of lowStock" class="flex justify-between items-center py-2.5 text-sm border-b border-maison-light-gray last:border-0">
+        <span class="truncate pr-3">{{ p.name }}</span>
+        <span class="label-caps text-[8px] text-orange-600 border border-orange-200 px-2 py-1 shrink-0">{{ p.stock }} restant(s)</span>
       </div>
     </div>
   </div>
 </div>
-
-

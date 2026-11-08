@@ -1,60 +1,81 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, DestroyRef, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { OrdersService } from '../../../../core/services/orders.service';
-import { AdminSidebarComponent } from '../admin-sidebar/admin-sidebar.component';
-import { Order, OrderStatus } from '../../../../models';
+import { AuthService } from '../../../../core/services/auth.service';
+import { ModalService } from '../../../../core/services/modal.service';
+import { cldUrl } from '../../../../core/services/media.service';
+import { formatPrice, whatsappUrl } from '../../../../core/utils/format';
+import { AdminSidebarComponent, AdminTab } from '../admin-sidebar/admin-sidebar.component';
+import { ORDER_STATUSES, Order, OrderStatus } from '../../../../models';
 
 @Component({
   selector: 'app-admin-order-detail',
   standalone: true,
   imports: [CommonModule, RouterModule, AdminSidebarComponent],
   templateUrl: './admin-order-detail.component.html',
-  styleUrl: './admin-order-detail.component.scss',
 })
 export class AdminOrderDetailComponent implements OnInit {
-  order: Order | null = null;
-  orderId: string | null = null;
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private ordersService = inject(OrdersService);
+  private auth = inject(AuthService);
+  private modal = inject(ModalService);
+  private destroyRef = inject(DestroyRef);
 
-  constructor(
-    private route: ActivatedRoute,
-    private router: Router,
-    private ordersService: OrdersService
-  ) {}
+  order: Order | null = null;
+  loading = true;
+  statuses = ORDER_STATUSES;
+  formatPrice = formatPrice;
 
   ngOnInit(): void {
-    this.orderId = this.route.snapshot.paramMap.get('id');
-    
-    if (this.orderId) {
-      this.order = this.ordersService.getById(this.orderId);
-      
-      if (!this.order) {
-        this.router.navigateByUrl('/admin');
-      }
-    } else {
-      this.router.navigateByUrl('/admin');
+    const id = this.route.snapshot.paramMap.get('id');
+    if (!id) {
+      this.goTab('orders');
+      return;
     }
-
-    // S'abonner aux changements de commandes
-    this.ordersService.orders$.subscribe(() => {
-      if (this.orderId) {
-        this.order = this.ordersService.getById(this.orderId);
-      }
-    });
+    this.ordersService
+      .watchById(id)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (o) => {
+          this.order = o;
+          this.loading = false;
+        },
+        error: () => (this.loading = false),
+      });
   }
 
-  formatPrice(price: number): string {
-    return new Intl.NumberFormat('fr-FR').format(price) + ' FCFA';
+  thumb(url: string): string {
+    return cldUrl(url, 'w_160,f_auto,q_auto');
   }
 
-  goBack(): void {
-    this.router.navigateByUrl('/admin');
+  get chatLink(): string {
+    const o = this.order;
+    if (!o) return '';
+    return whatsappUrl(o.customerWhatsapp || o.customerPhone, `Bonjour ${o.customerName}, c'est Maison Shein concernant votre commande ${o.ref}.`);
   }
 
-  updateStatus(newStatus: OrderStatus): void {
-    if (this.order && this.orderId) {
-      this.ordersService.updateOrderStatus(this.orderId, newStatus);
+  get callLink(): string {
+    return 'tel:' + (this.order?.customerPhone || '').replace(/[^\d+]/g, '');
+  }
+
+  async updateStatus(status: OrderStatus): Promise<void> {
+    if (!this.order) return;
+    try {
+      await this.ordersService.updateOrderStatus(this.order, status);
+    } catch (e) {
+      this.modal.alert('Mise à jour impossible : ' + (e as Error).message, 'error');
     }
+  }
+
+  goTab(tab: AdminTab): void {
+    this.router.navigate(['/admin'], { queryParams: { tab } });
+  }
+
+  async logout(): Promise<void> {
+    await this.auth.logout();
+    this.router.navigateByUrl('/admin/login');
   }
 }
-

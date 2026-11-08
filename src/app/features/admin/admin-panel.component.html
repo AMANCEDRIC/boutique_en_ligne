@@ -1,50 +1,46 @@
-<div class="min-h-screen bg-white flex">
+<div class="min-h-screen bg-maison-greige/40">
   <app-admin-sidebar
     [activeTab]="activeTab"
+    [pendingOrders]="pendingOrders"
     (tabChange)="setActiveTab($event)"
+    (logout)="logout()"
   ></app-admin-sidebar>
 
-  <div class="flex-1 p-16 overflow-auto md:ml-64">
-    <div class="flex justify-between items-center mb-16">
-      <h3 class="h1-editorial text-4xl uppercase tracking-tighter">
-        <ng-container [ngSwitch]="activeTab">
-          <span *ngSwitchCase="'stats'">Performance</span>
-          <span *ngSwitchCase="'products'">Catalogue</span>
-          <span *ngSwitchCase="'orders'">Commandes</span>
-        </ng-container>
-      </h3>
-      
-      <div class="flex items-center gap-4">
-         <span class="label-caps text-[9px] text-gray-400">Admin Session</span>
-         <div class="w-8 h-8 bg-black flex items-center justify-center text-[10px] text-white label-caps">A</div>
+  <!-- Alerte nouvelle commande -->
+  <div *ngIf="newOrder" class="fixed z-40 top-16 lg:top-6 inset-x-3 lg:left-auto lg:right-6 lg:w-96 bg-black text-white shadow-ambient border-l-4 border-maison-gold">
+    <div class="flex items-start gap-3 p-4">
+      <div class="flex-1 min-w-0">
+        <p class="label-caps text-[10px] text-maison-gold">Nouvelle commande</p>
+        <p class="text-sm mt-1 truncate">{{ newOrder.customerName }} — {{ formatPrice(newOrder.total) }}</p>
+        <p class="text-[11px] text-gray-400">{{ newOrder.ref }}</p>
       </div>
+      <button (click)="newOrder = null" class="text-gray-400 hover:text-white p-1" aria-label="Fermer">✕</button>
     </div>
+    <button (click)="openNewOrder()" class="w-full bg-white text-black py-2.5 text-[10px] font-bold uppercase tracking-wide">Voir la commande</button>
+  </div>
+
+  <main class="lg:ml-64 px-4 sm:px-8 lg:px-12 pt-20 pb-28 lg:pt-12 lg:pb-12">
+    <h1 class="font-serif text-2xl sm:text-3xl uppercase tracking-tight mb-6 sm:mb-10">{{ title }}</h1>
 
     <div class="max-w-[1400px]">
       <app-admin-stats
         *ngIf="activeTab === 'stats'"
         [products]="products"
-        [formatPriceFn]="formatPrice.bind(this)"
-        [totalStock]="totalStock"
+        [orders]="orders"
+        (goTo)="setActiveTab($event)"
       ></app-admin-stats>
 
-      <app-admin-products
-        *ngIf="activeTab === 'products'"
-        [products]="products"
-        (addProduct)="addProduct($event)"
-        (deleteProduct)="deleteProduct($event.id, $event.name)"
-        (editProduct)="editProduct($event)"
-        [formatPriceFn]="formatPrice.bind(this)"
-      ></app-admin-products>
+      <app-admin-products *ngIf="activeTab === 'products'" [products]="products"></app-admin-products>
+
+      <app-admin-categories *ngIf="activeTab === 'categories'" [products]="products"></app-admin-categories>
 
       <app-admin-orders
         *ngIf="activeTab === 'orders'"
         [orders]="orders"
-        [formatPriceFn]="formatPrice.bind(this)"
         (updateStatus)="onUpdateOrderStatus($event)"
       ></app-admin-orders>
+
+      <app-admin-settings *ngIf="activeTab === 'settings'"></app-admin-settings>
     </div>
-  </div>
+  </main>
 </div>
-
-

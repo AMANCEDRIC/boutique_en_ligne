@@ -1,85 +1,114 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, Input, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Product, SubCategory } from '../../../../models';
+import { ProductsService } from '../../../../core/services/products.service';
+import { ModalService } from '../../../../core/services/modal.service';
+import { cldUrl } from '../../../../core/services/media.service';
+import { formatPrice } from '../../../../core/utils/format';
+import { MainCategory, Product, SECTIONS, hasVideo } from '../../../../models';
+import { AdminProductFormComponent } from '../admin-product-form/admin-product-form.component';
+import { isFirebaseConfigured } from '../../../../../environments/environment';
 
 @Component({
   selector: 'app-admin-products',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, AdminProductFormComponent],
   templateUrl: './admin-products.component.html',
-  styleUrl: './admin-products.component.scss',
 })
 export class AdminProductsComponent {
+  private productsService = inject(ProductsService);
+  private modal = inject(ModalService);
+
   @Input() products: Product[] = [];
-  @Input() formatPriceFn!: (price: number) => string;
-  @Output() addProduct = new EventEmitter<Partial<Product>>();
-  @Output() deleteProduct = new EventEmitter<{ id: string; name: string }>();
-  @Output() editProduct = new EventEmitter<Product>();
 
-  // Stock maximum pour calculer le pourcentage (ajustez selon vos besoins)
-  private readonly MAX_STOCK = 50;
+  sections = SECTIONS;
+  formatPrice = formatPrice;
+  hasVideo = hasVideo;
 
-  newProduct: Partial<Product> = {
-    name: '',
-    price: 0,
-    category: 'Robes' as SubCategory,
-    description: '',
-    stock: 0,
-    image: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&q=80&w=1000' // Default placeholder
-  };
+  search = '';
+  sectionFilter: MainCategory | 'all' = 'all';
 
-  onFileSelected(event: any): void {
-    const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e: any) => {
-        this.newProduct.image = e.target.result;
-      };
-      reader.readAsDataURL(file);
+  /** undefined = formulaire fermé ; null = nouvel article ; Product = modification. */
+  editing: Product | null | undefined = undefined;
+  importing = false;
+
+  get filtered(): Product[] {
+    const q = this.search.trim().toLowerCase();
+    return this.products.filter(
+      (p) =>
+        (this.sectionFilter === 'all' || p.mainCategory === this.sectionFilter) &&
+        (!q || p.name.toLowerCase().includes(q) || p.category.toLowerCase().includes(q))
+    );
+  }
+
+  thumb(p: Product): string {
+    return cldUrl(p.image, 'w_200,f_auto,q_auto');
+  }
+
+  copiedId = '';
+
+  /** Copie le lien de l'article (à coller en légende TikTok / statut WhatsApp). */
+  async copyLink(p: Product): Promise<void> {
+    const url = `${window.location.origin}/product/${p.id}`;
+    try {
+      await navigator.clipboard.writeText(url);
+    } catch {
+      window.prompt('Copiez le lien de l’article :', url);
+      return;
+    }
+    this.copiedId = p.id;
+    setTimeout(() => (this.copiedId = this.copiedId === p.id ? '' : this.copiedId), 2000);
+  }
+
+  openNew(): void {
+    this.editing = null;
+  }
+
+  openEdit(p: Product): void {
+    this.editing = p;
+  }
+
+  onFormClosed(saved: boolean): void {
+    const wasEdit = !!this.editing;
+    this.editing = undefined;
+    if (saved) this.modal.alert(wasEdit ? 'Article mis à jour.' : 'Article publié sur la boutique.', 'success');
+  }
+
+  async remove(p: Product): Promise<void> {
+    const ok = await this.modal.confirm(
+      `Supprimer définitivement « ${p.name} » ? Il disparaîtra immédiatement de la boutique.`,
+      'Supprimer l’article'
+    );
+    if (!ok) return;
+    try {
+      await this.productsService.deleteProduct(p.id);
+    } catch (e) {
+      this.modal.alert('Suppression impossible : ' + (e as Error).message, 'error');
     }
   }
 
-  onAddProduct(): void {
-    this.addProduct.emit(this.newProduct);
-    this.newProduct = {
-      name: '',
-      price: 0,
-      category: 'Robes' as SubCategory,
-      description: '',
-      stock: 0,
-      image: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&q=80&w=1000'
-    };
+  async adjustStock(p: Product, delta: number): Promise<void> {
+    try {
+      await this.productsService.setStock(p.id, (p.stock || 0) + delta);
+    } catch (e) {
+      this.modal.alert('Mise à jour impossible : ' + (e as Error).message, 'error');
+    }
   }
 
-  onDeleteProduct(p: Product): void {
-    this.deleteProduct.emit({ id: p.id, name: p.name });
-  }
-
-  onEditProduct(p: Product): void {
-    this.editProduct.emit(p);
-  }
-
-  // Calculer le pourcentage de stock
-  getStockPercentage(stock: number): number {
-    return Math.min((stock / this.MAX_STOCK) * 100, 100);
-  }
-
-  // Obtenir la couleur de la barre selon le niveau de stock
-  getStockColor(stock: number): string {
-    const percentage = this.getStockPercentage(stock);
-    if (percentage <= 20) return 'bg-red-500';
-    if (percentage <= 50) return 'bg-yellow-500';
-    return 'bg-green-500';
-  }
-
-  // Helper pour l'inventaire
-  getTotalStockPieces(): number {
-    return this.products.reduce((acc, p) => acc + (p.stock || 0), 0);
-  }
-
-  getLowStockCount(): number {
-    return this.products.filter(p => (p.stock || 0) < 10).length;
+  async importDemo(): Promise<void> {
+    if (!isFirebaseConfigured) return;
+    const ok = await this.modal.confirm(
+      'Ajouter les 10 articles de démonstration à la boutique ? Vous pourrez les modifier ou les supprimer ensuite.',
+      'Articles de démonstration'
+    );
+    if (!ok) return;
+    this.importing = true;
+    try {
+      await this.productsService.importDemoProducts();
+    } catch (e) {
+      this.modal.alert('Import impossible : ' + (e as Error).message, 'error');
+    } finally {
+      this.importing = false;
+    }
   }
 }
-

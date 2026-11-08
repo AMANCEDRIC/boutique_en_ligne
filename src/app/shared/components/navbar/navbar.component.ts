@@ -5,7 +5,9 @@ import { FormsModule } from '@angular/forms';
 import { CartService } from '../../../core/services/cart.service';
 import { WishlistService } from '../../../core/services/wishlist.service';
 import { CartItem } from '../../../models/cart-item.model';
-import { Product } from '../../../models/product.model';
+import { MainCategory, Product, SECTIONS } from '../../../models/product.model';
+import { Category } from '../../../models/category.model';
+import { CategoriesService } from '../../../core/services/categories.service';
 import { filter } from 'rxjs/operators';
 
 @Component({
@@ -17,6 +19,10 @@ import { filter } from 'rxjs/operators';
 })
 export class NavbarComponent implements OnInit, OnDestroy {
   navFilter: string = 'all';
+  navSection = '';
+  sections = SECTIONS;
+  categoriesBySection: Partial<Record<MainCategory, Category[]>> = {};
+  openMobileSection = '';
   cartCount = 0;
   wishlistCount = 0;
   cartTotal = 0;
@@ -42,7 +48,8 @@ export class NavbarComponent implements OnInit, OnDestroy {
   constructor(
     private router: Router,
     private cartService: CartService,
-    private wishlistService: WishlistService
+    private wishlistService: WishlistService,
+    private categoriesService: CategoriesService
   ) {}
 
   @HostListener('window:scroll', [])
@@ -78,6 +85,11 @@ export class NavbarComponent implements OnInit, OnDestroy {
       this.wishlistCount = products.length;
     });
 
+    this.categoriesService.categories$.subscribe((list) => {
+      this.categoriesBySection = {};
+      list.forEach((c) => (this.categoriesBySection[c.section] ??= []).push(c));
+    });
+
     this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))
       .subscribe((event: any) => {
@@ -93,6 +105,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
         } else {
           this.navFilter = 'all';
         }
+        this.navSection = path.startsWith('/shop') ? url.searchParams.get('section') ?? '' : '';
 
         // Close mobile drawer on navigation change
         this.closeMobileMenu();
@@ -148,13 +161,14 @@ export class NavbarComponent implements OnInit, OnDestroy {
     }
   }
 
-  goCategory(cat: string): void {
+  goSection(slug: string, categoryId?: string): void {
     this.closeMobileMenu();
-    this.router.navigate(['/shop'], {
-      queryParams: { category: cat }
-    });
+    this.router.navigate(['/shop'], { queryParams: { section: slug, category: categoryId ?? null } });
   }
 
+  toggleMobileSection(slug: string): void {
+    this.openMobileSection = this.openMobileSection === slug ? '' : slug;
+  }
   goHome(): void {
     this.navFilter = 'all';
     this.closeMobileMenu();
@@ -167,11 +181,6 @@ export class NavbarComponent implements OnInit, OnDestroy {
     this.router.navigate(['/shop'], {
       queryParams: { filter: filter === 'all' ? null : filter }
     });
-  }
-
-  goAdmin(): void {
-    this.closeMobileMenu();
-    this.router.navigateByUrl('/admin');
   }
 
   goWishlist(): void {

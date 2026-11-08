@@ -1,118 +1,111 @@
-<div class="max-w-[1800px] mx-auto px-4 sm:px-6 md:px-12 py-6 sm:py-20">
-  <!-- Shop Header -->
-  <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-6 sm:mb-16 gap-4 sm:gap-8">
-    <div class="space-y-1 sm:space-y-4">
-      <h1 class="font-serif text-3xl sm:text-5xl uppercase tracking-tight">Collection</h1>
-      <p class="label-caps text-[9px] sm:text-[10px] text-gray-400">
-        {{ filteredProducts.length }} Pièces sélectionnées
-      </p>
+<div class="max-w-[1800px] mx-auto px-4 sm:px-6 md:px-12 py-6 sm:py-16">
+  <!-- En-tête -->
+  <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-5 sm:mb-10 gap-4">
+    <div class="space-y-1 sm:space-y-3">
+      <h1 class="font-serif text-3xl sm:text-5xl uppercase tracking-tight">{{ title }}</h1>
+      <p class="label-caps text-[9px] sm:text-[10px] text-gray-400">{{ filteredProducts.length }} article(s)</p>
     </div>
-    
-    <!-- Sorting & Mobile quick bar -->
-    <div class="flex items-center justify-between w-full md:w-auto border-t border-b md:border-none border-maison-light-gray py-3 md:py-0">
-      <div class="flex items-center gap-3">
-        <span class="label-caps text-[9px] text-gray-400">Trier:</span>
-        <select 
-          [value]="sortBy"
-          (change)="onSortChange($any($event.target).value)"
-          class="bg-transparent label-caps text-[10px] sm:text-[11px] border-none focus:ring-0 cursor-pointer p-0 pr-6"
-        >
+
+    <div class="flex items-center justify-between w-full md:w-auto gap-6 border-y md:border-none border-maison-light-gray py-3 md:py-0">
+      <label class="flex items-center gap-3">
+        <span class="label-caps text-[9px] text-gray-400">Trier :</span>
+        <select [value]="sortBy" (change)="onSortChange($any($event.target).value)"
+          class="bg-transparent label-caps text-[10px] sm:text-[11px] border-none focus:ring-0 cursor-pointer p-0 pr-6">
           <option value="newest">Nouveautés</option>
           <option value="price-asc">Prix croissant</option>
           <option value="price-desc">Prix décroissant</option>
         </select>
-      </div>
-
-      <!-- Quick Reset button if filter active -->
-      <button 
-        *ngIf="selectedCategory !== 'all' || activeFilter !== 'all' || selectedSize !== 'all'"
-        (click)="onCategoryChange('all'); onFilterChange('all'); onSizeChange('all')" 
-        class="label-caps text-[8px] sm:text-[9px] text-maison-gold underline">
-        Effacer filtres
+      </label>
+      <button *ngIf="hasFilters" (click)="clearAll()" class="label-caps text-[8px] sm:text-[9px] text-[#8a6d00] underline">
+        Effacer les filtres
       </button>
     </div>
   </div>
 
-  <!-- Mobile Category Scrollable Pills (Style App Native) -->
-  <div class="lg:hidden flex items-center gap-2 overflow-x-auto pb-4 mb-6 no-scrollbar">
-    <button 
-      (click)="onCategoryChange('all')"
-      [ngClass]="selectedCategory === 'all' ? 'bg-black text-white' : 'bg-maison-greige text-black hover:bg-gray-200'"
-      class="px-4 py-2 text-[10px] label-caps whitespace-nowrap rounded-full transition-colors">
-      Toutes les pièces
+  <!-- Rubriques -->
+  <div class="flex gap-2 overflow-x-auto no-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0 mb-3">
+    <button (click)="setSection(null)"
+      class="px-5 py-2.5 text-[10px] label-caps whitespace-nowrap border"
+      [ngClass]="!section ? 'bg-black text-white border-black' : 'border-maison-light-gray text-gray-600 hover:border-black'">
+      Tout
     </button>
-    <button 
-      *ngFor="let cat of availableCategories"
-      (click)="onCategoryChange(cat)"
-      [ngClass]="selectedCategory === cat ? 'bg-black text-white' : 'bg-maison-greige text-black hover:bg-gray-200'"
-      class="px-4 py-2 text-[10px] label-caps whitespace-nowrap rounded-full transition-colors">
-      {{ cat }}
+    <button *ngFor="let s of sections" (click)="setSection(s.slug)"
+      class="px-5 py-2.5 text-[10px] label-caps whitespace-nowrap border"
+      [ngClass]="section?.id === s.id ? 'bg-black text-white border-black' : 'border-maison-light-gray text-gray-600 hover:border-black'">
+      {{ s.id }}
     </button>
   </div>
 
-  <div class="flex flex-col lg:flex-row gap-8 lg:gap-20">
-    <!-- Desktop Sidebar Filters -->
-    <aside class="hidden lg:block lg:w-64 flex-shrink-0 space-y-16">
-      <!-- Categories -->
-      <div class="space-y-8">
+  <!-- Catégories (mobile) -->
+  <div class="lg:hidden flex gap-2 overflow-x-auto no-scrollbar -mx-4 px-4 pb-2 mb-4">
+    <button (click)="setCategory(null)"
+      [ngClass]="!categoryId ? 'bg-black text-white' : 'bg-maison-greige text-black'"
+      class="px-4 py-2 text-[10px] label-caps whitespace-nowrap rounded-full">
+      Toutes
+    </button>
+    <button *ngFor="let c of categories" (click)="setCategory(c.id)"
+      [ngClass]="categoryId === c.id ? 'bg-black text-white' : 'bg-maison-greige text-black'"
+      class="px-4 py-2 text-[10px] label-caps whitespace-nowrap rounded-full">
+      {{ c.name }}
+    </button>
+  </div>
+
+  <!-- Tailles (mobile) -->
+  <div *ngIf="sizes.length" class="lg:hidden flex gap-2 overflow-x-auto no-scrollbar -mx-4 px-4 pb-2 mb-6">
+    <button *ngFor="let s of sizes" (click)="toggleSize(s)"
+      [ngClass]="size === s ? 'bg-black text-white border-black' : 'border-maison-light-gray text-gray-500'"
+      class="min-w-[44px] px-3 py-1.5 border text-[10px] whitespace-nowrap">
+      {{ s }}
+    </button>
+  </div>
+
+  <div class="flex flex-col lg:flex-row gap-8 lg:gap-16 lg:mt-8">
+    <!-- Filtres desktop -->
+    <aside class="hidden lg:block lg:w-56 flex-shrink-0 space-y-12">
+      <div class="space-y-6">
         <h4 class="label-caps text-[11px]">Catégories</h4>
         <div class="space-y-4">
-          <button 
-            (click)="onCategoryChange('all')"
-            [ngClass]="selectedCategory === 'all' ? 'text-black font-bold' : 'text-gray-400'"
-            class="block label-caps text-[10px] hover:text-black transition-colors relative group"
-          >
-            Tout voir
-            <span class="absolute -left-4 top-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-maison-gold rounded-full transition-transform duration-300"
-                  [ngClass]="selectedCategory === 'all' ? 'scale-100' : 'scale-0 group-hover:scale-50'"></span>
-          </button>
-          <button 
-            *ngFor="let cat of availableCategories"
-            (click)="onCategoryChange(cat)"
-            [ngClass]="selectedCategory === cat ? 'text-black font-bold' : 'text-gray-400'"
-            class="block label-caps text-[10px] hover:text-black transition-colors relative group"
-          >
-            {{ cat }}
-            <span class="absolute -left-4 top-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-maison-gold rounded-full transition-transform duration-300"
-                  [ngClass]="selectedCategory === cat ? 'scale-100' : 'scale-0 group-hover:scale-50'"></span>
+          <button (click)="setCategory(null)" [ngClass]="!categoryId ? 'text-black' : 'text-gray-400'"
+            class="block label-caps text-[10px] hover:text-black">Tout voir</button>
+          <button *ngFor="let c of categories" (click)="setCategory(c.id)"
+            [ngClass]="categoryId === c.id ? 'text-black' : 'text-gray-400'"
+            class="block label-caps text-[10px] hover:text-black text-left">
+            <span *ngIf="categoryId === c.id" class="inline-block w-1.5 h-1.5 bg-maison-gold rounded-full mr-2 align-middle"></span>{{ c.name }}
           </button>
         </div>
       </div>
 
-      <!-- Sizes -->
-      <div class="space-y-8">
-        <h4 class="label-caps text-[11px]">Tailles</h4>
-        <div class="grid grid-cols-4 lg:grid-cols-5 gap-2">
-          <button 
-            *ngFor="let size of availableSizes"
-            (click)="toggleSize(size)"
-            [ngClass]="selectedSize === size ? 'bg-black text-white' : 'border border-maison-light-gray text-gray-400 hover:border-black hover:text-black'"
-            class="aspect-square flex items-center justify-center text-[10px] font-sans tracking-widest transition-all p-1"
-          >
-            {{ size }}
+      <div *ngIf="sizes.length" class="space-y-6">
+        <h4 class="label-caps text-[11px]">{{ sizeTitle }}</h4>
+        <div class="grid grid-cols-4 gap-2">
+          <button *ngFor="let s of sizes" (click)="toggleSize(s)"
+            [ngClass]="size === s ? 'bg-black text-white' : 'border border-maison-light-gray text-gray-400 hover:border-black hover:text-black'"
+            class="aspect-square flex items-center justify-center text-[10px] p-1">
+            {{ s }}
           </button>
         </div>
       </div>
     </aside>
 
-    <!-- Product Grid (2 columns on Mobile, 3 on Tablet, 4 on Desktop) -->
+    <!-- Grille -->
     <div class="flex-grow">
-      <div *ngIf="filteredProducts.length > 0; else noResults" 
-           class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-3 sm:gap-x-8 gap-y-8 sm:gap-y-20">
-        <app-product-card
-          *ngFor="let product of filteredProducts"
-          [product]="product"
-          (addToCart)="onAddToCart($event)"
-          (toggleWishlist)="onToggleWishlist($event)"
-        ></app-product-card>
-      </div>
-      
-      <ng-template #noResults>
-        <div class="text-center py-20 sm:py-32 space-y-6">
-          <p class="font-serif text-xl sm:text-2xl italic text-gray-400">Aucune pièce ne correspond à votre sélection.</p>
-          <button (click)="onCategoryChange('all')" class="label-caps border-b border-black pb-1">Réinitialiser les filtres</button>
+      <div *ngIf="loading" class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-3 sm:gap-x-8 gap-y-8">
+        <div *ngFor="let i of [1, 2, 3, 4, 5, 6]" class="space-y-3">
+          <div class="aspect-[3/4] bg-maison-greige animate-pulse"></div>
+          <div class="h-3 w-2/3 bg-maison-greige animate-pulse"></div>
         </div>
-      </ng-template>
+      </div>
+
+      <div *ngIf="!loading && filteredProducts.length"
+        class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-3 sm:gap-x-8 gap-y-8 sm:gap-y-16">
+        <app-product-card *ngFor="let product of filteredProducts" [product]="product"
+          (addToCart)="onAddToCart($event)" (toggleWishlist)="onToggleWishlist($event)"></app-product-card>
+      </div>
+
+      <div *ngIf="!loading && !filteredProducts.length" class="text-center py-20 sm:py-32 space-y-6">
+        <p class="font-serif text-xl sm:text-2xl italic text-gray-400">Aucun article ne correspond à votre sélection.</p>
+        <button (click)="clearAll()" class="label-caps border-b border-black pb-1">Voir tous les articles</button>
+      </div>
     </div>
   </div>
 </div>

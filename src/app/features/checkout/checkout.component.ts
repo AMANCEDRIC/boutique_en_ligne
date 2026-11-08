@@ -1,124 +1,117 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, DestroyRef, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CartService } from '../../core/services/cart.service';
 import { OrdersService } from '../../core/services/orders.service';
+import { SettingsService } from '../../core/services/settings.service';
 import { ModalService } from '../../core/services/modal.service';
-import { CartItem, Order } from '../../models';
+import { cldUrl } from '../../core/services/media.service';
+import { formatPrice } from '../../core/utils/format';
+import { CartItem, Order, toOrderItem } from '../../models';
+import { isFirebaseConfigured } from '../../../environments/environment';
+
+const PAYMENT_METHODS = ['Paiement à la livraison', 'Mobile Money (Wave / Orange / MTN)'];
 
 @Component({
   selector: 'app-checkout',
   standalone: true,
   imports: [CommonModule, RouterModule, FormsModule],
   templateUrl: './checkout.component.html',
-  styleUrl: './checkout.component.scss',
 })
 export class CheckoutComponent implements OnInit {
+  private router = inject(Router);
+  private cartService = inject(CartService);
+  private ordersService = inject(OrdersService);
+  private settings = inject(SettingsService);
+  private modalService = inject(ModalService);
+  private destroyRef = inject(DestroyRef);
+
   cartItems: CartItem[] = [];
   totalCart = 0;
+  paymentMethods = PAYMENT_METHODS;
+  formatPrice = formatPrice;
 
-  // Formulaire
   customerName = '';
-  customerEmail = '';
   customerPhone = '';
+  customerWhatsapp = '';
+  sameWhatsapp = true;
+  customerDistrict = '';
   customerAddress = '';
-  paymentMethod = 'Paiement à la livraison';
+  notes = '';
+  paymentMethod = PAYMENT_METHODS[0];
 
   isSubmitting = false;
 
-  constructor(
-    private router: Router,
-    private cartService: CartService,
-    private ordersService: OrdersService,
-    private modalService: ModalService
-  ) {}
-
   ngOnInit(): void {
-    this.cartService.items$.subscribe((items) => {
+    this.cartService.items$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((items) => {
       this.cartItems = items;
       this.totalCart = this.cartService.getTotal();
     });
-
-    // Rediriger si le panier est vide
-    if (this.cartItems.length === 0) {
+    if (this.cartItems.length === 0 && !this.isSubmitting) {
       this.router.navigateByUrl('/cart');
     }
   }
 
-  formatPrice(price: number): string {
-    return new Intl.NumberFormat('fr-FR').format(price) + ' FCFA';
+  thumb(url: string): string {
+    return cldUrl(url, 'w_160,f_auto,q_auto');
   }
 
   async submitOrder(): Promise<void> {
-    // Validation
-    if (!this.customerName.trim()) {
-      await this.modalService.alert('Veuillez saisir votre nom.', 'warning');
+    const missing = !this.customerName.trim()
+      ? 'votre nom'
+      : !this.customerPhone.trim()
+        ? 'votre numéro de téléphone'
+        : !this.customerAddress.trim()
+          ? 'votre ville / adresse de livraison'
+          : '';
+    if (missing) {
+      await this.modalService.alert(`Veuillez indiquer ${missing}.`, 'warning');
       return;
     }
-
-    if (!this.customerPhone.trim()) {
-      await this.modalService.alert('Veuillez saisir votre numéro de téléphone.', 'warning');
-      return;
-    }
-
-    if (!this.customerAddress.trim()) {
-      await this.modalService.alert('Veuillez saisir votre adresse (localité).', 'warning');
-      return;
-    }
-
     if (this.cartItems.length === 0) {
       await this.modalService.alert('Votre panier est vide.', 'warning');
       return;
     }
 
     this.isSubmitting = true;
-
-    // Créer la commande
-    const newOrder: Order = {
-      id: this.ordersService.generateOrderId(),
-      date: new Date().toISOString().split('T')[0],
+    const now = new Date();
+    const order: Omit<Order, 'id'> = {
+      ref: this.ordersService.generateRef(),
+      date: now.toISOString().split('T')[0],
+      createdAt: now.getTime(),
       customerName: this.customerName.trim(),
       customerPhone: this.customerPhone.trim(),
+      customerWhatsapp: (this.sameWhatsapp ? this.customerPhone : this.customerWhatsapp).trim(),
+      customerDistrict: this.customerDistrict.trim(),
       customerAddress: this.customerAddress.trim(),
-      customerEmail: this.customerEmail.trim(),
-      items: [...this.cartItems],
+      notes: this.notes.trim(),
+      items: this.cartItems.map(toOrderItem),
       total: this.totalCart,
       status: 'En attente',
       paymentMethod: this.paymentMethod,
     };
 
-    // Sauvegarder la commande (pour le panel admin)
-    this.ordersService.addOrder(newOrder);
+    // On enregistre la commande pour l'admin ; en cas d'échec réseau on envoie quand même
+    // le message WhatsApp pour ne pas perdre la vente.
+    if (isFirebaseConfigured) {
+      try {
+        await this.ordersService.addOrder(order);
+      } catch (err) {
+        console.error('Enregistrement de la commande impossible :', err);
+      }
+    }
+    this.ordersService.rememberLastOrder(order);
 
-    // Formater le message WhatsApp
-    let message = `Bonjour Maison Shein, je souhaite valider ma commande (Réf: ${newOrder.id}) :\n\n`;
-    
-    this.cartItems.forEach(item => {
-      message += `- ${item.quantity}x ${item.name} (Taille: ${item.selectedSize}) - ${this.formatPrice(item.price * item.quantity)}\n`;
-    });
-    
-    message += `\n*TOTAL : ${this.formatPrice(this.totalCart)}*\n\n`;
-    message += `*Mes Coordonnées :*\n`;
-    message += `Nom : ${this.customerName}\n`;
-    message += `Téléphone : ${this.customerPhone}\n`;
-    message += `Adresse : ${this.customerAddress}\n`;
-    message += `Paiement souhaité : ${this.paymentMethod}\n`;
-
-    const encodedMessage = encodeURIComponent(message);
-    const whatsappUrl = `https://wa.me/33600000000?text=${encodedMessage}`;
-
-    // Vider le panier
+    const url = this.settings.whatsappLink(this.ordersService.whatsappMessage(order));
     this.cartService.clearCart();
-
-    this.isSubmitting = false;
-
-    // Rediriger vers WhatsApp
-    window.location.href = whatsappUrl;
+    // Page de confirmation d'abord : au retour de WhatsApp (bouton « précédent »), la cliente y revient.
+    await this.router.navigate(['/order-confirmation', order.ref]);
+    window.location.href = url;
   }
 
   goBack(): void {
     this.router.navigateByUrl('/cart');
   }
 }
-

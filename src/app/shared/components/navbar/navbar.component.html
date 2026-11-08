@@ -6,11 +6,12 @@
     '-translate-y-full': isHidden,
     'translate-y-0': !isHidden
   }">
-  <div class="max-w-[1800px] mx-auto px-4 md:px-6 flex items-center justify-between transition-all duration-500"
-    [ngClass]="isTransparent ? 'py-4 md:py-5' : 'py-2.5 md:py-3'">
-    
+  <!-- Grille 3 colonnes : logo | menu centré | icônes -->
+  <div class="max-w-[1800px] mx-auto px-4 md:px-6 flex lg:grid lg:grid-cols-[auto_1fr_auto] xl:grid-cols-[1fr_auto_1fr] items-center justify-between gap-4 xl:gap-6 transition-all duration-500"
+    [ngClass]="isTransparent ? 'py-3 md:py-4' : 'py-2 md:py-2.5'">
+
     <!-- Gauche: Hamburger (Mobile) + Logo -->
-    <div class="flex items-center space-x-3 md:space-x-4">
+    <div class="flex items-center gap-2 md:gap-4 min-w-0">
       <!-- Bouton Menu Mobile Hamburger -->
       <button 
         (click)="toggleMobileMenu()"
@@ -23,54 +24,52 @@
       </button>
 
       <!-- Logo -->
-      <div class="cursor-pointer flex-shrink-0" (click)="goHome()">
-        <h1 class="font-serif tracking-[-0.05em] hover:opacity-70 transition-all uppercase"
-            [ngClass]="isTransparent ? 'text-xl md:text-3xl text-white' : 'text-lg md:text-2xl text-black'">
+      <a routerLink="/" (click)="goHome()" class="flex-shrink-0" aria-label="Maison Shein — accueil">
+        <span class="font-script whitespace-nowrap leading-none hover:opacity-70 transition-all block"
+            [ngClass]="isTransparent ? 'text-[28px] md:text-[32px] xl:text-[38px] text-white' : 'text-[26px] md:text-[30px] xl:text-[32px] text-black'">
           Maison Shein
-        </h1>
-      </div>
+        </span>
+      </a>
     </div>
 
     <!-- Navigation centrale (Desktop) -->
-    <div class="hidden lg:flex items-center space-x-10">
-      <button
-        (click)="goShop('vetements')"
-        class="label-caps transition-colors py-2 relative group"
-        [ngClass]="isTransparent
-          ? (navFilter === 'vetements' ? 'text-white' : 'text-white/60 hover:text-white')
-          : (navFilter === 'vetements' ? 'text-black' : 'text-gray-400 hover:text-black')"
-      >
-        Vêtements
-        <span class="absolute bottom-0 left-0 w-full h-0.5 transform transition-transform duration-300"
-              [ngClass]="{
-                'bg-white': isTransparent,
-                'bg-black': !isTransparent,
-                'scale-x-100': navFilter === 'vetements',
-                'scale-x-0 group-hover:scale-x-100': navFilter !== 'vetements'
-              }"></span>
-      </button>
+    <div class="hidden lg:flex items-center justify-center gap-4 xl:gap-9 whitespace-nowrap">
+      <div *ngFor="let s of sections" class="relative group">
+        <button
+          (click)="goSection(s.slug)"
+          class="nav-link py-2 relative"
+          [ngClass]="isTransparent
+            ? (navSection === s.slug ? 'text-white' : 'text-white/70 hover:text-white')
+            : (navSection === s.slug ? 'text-black' : 'text-gray-500 hover:text-black')"
+        >
+          {{ s.id }}
+          <span class="absolute bottom-0 left-0 w-full h-0.5 transform transition-transform duration-300"
+                [ngClass]="{
+                  'bg-white': isTransparent,
+                  'bg-black': !isTransparent,
+                  'scale-x-100': navSection === s.slug,
+                  'scale-x-0 group-hover:scale-x-100': navSection !== s.slug
+                }"></span>
+        </button>
+        <div *ngIf="categoriesBySection[s.id]?.length" class="absolute top-full left-0 pt-4 hidden group-hover:block w-52 z-50">
+          <div class="bg-white shadow-xl border border-gray-100 py-2 flex flex-col">
+            <a *ngFor="let c of categoriesBySection[s.id]" routerLink="/shop" [queryParams]="{ section: s.slug, category: c.id }"
+              class="px-4 py-2 label-caps text-[10px] text-gray-500 hover:text-black hover:bg-gray-50 text-left">{{ c.name }}</a>
+            <a routerLink="/shop" [queryParams]="{ section: s.slug }"
+              class="px-4 py-2 label-caps text-[10px] text-black hover:bg-gray-50 text-left border-t border-gray-100 mt-1">Tout voir</a>
+          </div>
+        </div>
+      </div>
 
-      <button
-        (click)="goCategory('Accessoires')"
-        class="label-caps transition-colors py-2 relative group"
+      <a routerLink="/shop" [queryParams]="{ filter: 'new' }" class="nav-link py-2"
         [ngClass]="isTransparent
-          ? (navFilter === 'Accessoires' ? 'text-white' : 'text-white/60 hover:text-white')
-          : (navFilter === 'Accessoires' ? 'text-black' : 'text-gray-400 hover:text-black')"
-      >
-        Accessoires
-        <span class="absolute bottom-0 left-0 w-full h-0.5 transform transition-transform duration-300"
-              [ngClass]="{
-                'bg-white': isTransparent,
-                'bg-black': !isTransparent,
-                'scale-x-100': navFilter === 'Accessoires',
-                'scale-x-0 group-hover:scale-x-100': navFilter !== 'Accessoires'
-              }"></span>
-      </button>
+          ? (navFilter === 'new' ? 'text-white' : 'text-white/70 hover:text-white')
+          : (navFilter === 'new' ? 'text-black' : 'text-gray-500 hover:text-black')">Nouveautés</a>
 
       <div class="relative group">
         <button
-          class="label-caps transition-colors py-2 flex items-center space-x-1"
-          [ngClass]="isTransparent ? 'text-white/60 hover:text-white' : 'text-gray-400 hover:text-black'"
+          class="nav-link py-2 flex items-center gap-1"
+          [ngClass]="isTransparent ? 'text-white/70 hover:text-white' : 'text-gray-500 hover:text-black'"
         >
           <span>Informations</span>
           <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -83,38 +82,22 @@
             <a routerLink="/how-to-order" class="px-4 py-2 label-caps text-[10px] text-gray-500 hover:text-black hover:bg-gray-50 transition-colors text-left">Comment commander</a>
             <a routerLink="/delivery" class="px-4 py-2 label-caps text-[10px] text-gray-500 hover:text-black hover:bg-gray-50 transition-colors text-left">Livraison</a>
             <a routerLink="/payment" class="px-4 py-2 label-caps text-[10px] text-gray-500 hover:text-black hover:bg-gray-50 transition-colors text-left">Paiement</a>
+            <a routerLink="/about" class="px-4 py-2 label-caps text-[10px] text-gray-500 hover:text-black hover:bg-gray-50 transition-colors text-left border-t border-gray-100 mt-1">À propos</a>
           </div>
         </div>
       </div>
 
       <a
-        routerLink="/about"
-        class="label-caps transition-colors py-2"
-        [ngClass]="isTransparent ? 'text-white/60 hover:text-white' : 'text-gray-400 hover:text-black'"
-      >
-        À propos
-      </a>
-
-      <a
         routerLink="/contact"
-        class="label-caps transition-colors py-2"
-        [ngClass]="isTransparent ? 'text-white/60 hover:text-white' : 'text-gray-400 hover:text-black'"
+        class="nav-link py-2"
+        [ngClass]="isTransparent ? 'text-white/70 hover:text-white' : 'text-gray-500 hover:text-black'"
       >
         Contact
       </a>
     </div>
 
     <!-- Actions droites -->
-    <div class="flex items-center space-x-3 md:space-x-6">
-      <button
-        (click)="goAdmin()"
-        class="hidden sm:block label-caps text-[10px] px-3.5 py-1.5 transition-all border"
-        [ngClass]="isTransparent
-          ? 'text-white/80 hover:text-white border-white/30'
-          : 'text-gray-500 hover:text-black border-maison-light-gray'"
-      >
-        Admin
-      </button>
+    <div class="flex items-center justify-end space-x-3 md:space-x-6">
 
       <div class="flex items-center space-x-2 md:space-x-4">
         <!-- Recherche (visible partout) -->
@@ -195,7 +178,7 @@
   <div class="flex items-center justify-between py-5 px-6 border-b border-gray-100">
     <div class="cursor-pointer" (click)="goHome()">
       <!-- Utilisation d'une police script pour imiter le style du logo de l'image -->
-      <h2 class="text-3xl tracking-tight text-black" style="font-family: 'Brush Script MT', 'Dancing Script', cursive;">Maison Shein</h2>
+      <h2 class="font-script text-[32px] text-black leading-none">Maison Shein</h2>
     </div>
     <button (click)="closeMobileMenu()" class="p-2 -mr-2 text-gray-500 hover:text-black transition-colors" aria-label="Fermer le menu">
       <!-- Croix très fine -->
@@ -207,14 +190,23 @@
 
   <!-- Liens du menu -->
   <div class="flex flex-col">
-    <button (click)="goShop('vetements')" class="flex items-center justify-between py-5 px-6 border-b border-gray-50 hover:bg-gray-50 transition-colors text-left w-full">
-      <span class="font-sans text-[11px] font-medium uppercase tracking-[0.15em] text-black/80">Vêtements</span>
-      <span class="text-gray-400 font-light">+</span>
+    <div *ngFor="let s of sections" class="border-b border-gray-50">
+      <button (click)="toggleMobileSection(s.slug)" class="flex items-center justify-between py-5 px-6 hover:bg-gray-50 text-left w-full">
+        <span class="font-sans text-[11px] font-medium uppercase tracking-[0.15em] text-black/80">{{ s.id }}</span>
+        <span class="text-gray-400 font-light">{{ openMobileSection === s.slug ? '−' : '+' }}</span>
+      </button>
+      <div *ngIf="openMobileSection === s.slug" class="pb-4 px-6 flex flex-col">
+        <button (click)="goSection(s.slug)" class="py-2.5 pl-4 text-left text-[11px] uppercase tracking-[0.12em] text-black font-semibold">Tout voir</button>
+        <button *ngFor="let c of categoriesBySection[s.id]" (click)="goSection(s.slug, c.id)"
+          class="py-2.5 pl-4 text-left text-[11px] uppercase tracking-[0.12em] text-black/70">{{ c.name }}</button>
+      </div>
+    </div>
+
+    <button (click)="goShop('new')" class="flex items-center justify-between py-5 px-6 border-b border-gray-50 hover:bg-gray-50 text-left w-full">
+      <span class="font-sans text-[11px] font-medium uppercase tracking-[0.15em] text-black/80">Nouveautés</span>
     </button>
-    
-    <button (click)="goCategory('Accessoires')" class="flex items-center justify-between py-5 px-6 border-b border-gray-50 hover:bg-gray-50 transition-colors text-left w-full">
-      <span class="font-sans text-[11px] font-medium uppercase tracking-[0.15em] text-black/80">Accessoires</span>
-      <span class="text-gray-400 font-light">+</span>
+    <button (click)="goShop('sale')" class="flex items-center justify-between py-5 px-6 border-b border-gray-50 hover:bg-gray-50 text-left w-full">
+      <span class="font-sans text-[11px] font-medium uppercase tracking-[0.15em] text-black/80">Déstockage</span>
     </button>
 
     <div class="py-5 px-6 border-b border-gray-50">
